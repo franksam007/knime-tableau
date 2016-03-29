@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<fragment>
+   <extension
+         point="org.knime.ext.tableau">
+      <libFolder
+            path="tableausdk-linux64-9200.15.1201.0018/lib64/tableausdk/">
+      </libFolder>
+   </extension>
+
+</fragment>
