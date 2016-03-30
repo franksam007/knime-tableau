@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<knimeNode icon="./tableau.png" type="Visualizer" xmlns="http://knime.org/node/v2.8" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://knime.org/node/v2.10 http://knime.org/node/v2.10.xsd">
+    <name>Tableau Writer (TDE)</name>
+    
+    <shortDescription>
+        Writes the input table as Tableau Data Extract (TDE) file.
+    </shortDescription>
+    
+    <fullDescription>
+        <intro>
+        	<p>
+            	Writes the input table as Tableau Data Extract (TDE) file.
+        	</p>
+       	</intro>
+    </fullDescription>
+    
+    <ports>
+        <inPort index="0" name="Data">Data to be written as Tableau Data Extract (TDE). Only primitive types 
+        (string, numbers, dates) are used -- all remaining columns are ignored.</inPort>
+    </ports>    
+</knimeNode>

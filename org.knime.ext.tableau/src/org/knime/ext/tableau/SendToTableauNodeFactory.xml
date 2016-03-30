@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<knimeNode icon="./tableau.png" type="Visualizer" xmlns="http://knime.org/node/v2.8" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://knime.org/node/v2.10 http://knime.org/node/v2.10.xsd">
+    <name>Send To Tableau</name>
+    
+    <shortDescription>
+        Sends the input data to a Tableau Server.
+    </shortDescription>
+    
+    <fullDescription>
+        <intro>
+        	<p>
+            	Sends the input data to a Tableau Server.
+        	</p>
+       	</intro>
+        <option name="Host">
+        <p>
+	       Tableau Server Host
+        </p>
+        </option>
+    </fullDescription>
+    
+    <ports>
+        <inPort index="0" name="Data">Data to be sent to Tableau Server. Only primitive types 
+        (string, numbers, dates) are used.</inPort>
+    </ports>    
+</knimeNode>
