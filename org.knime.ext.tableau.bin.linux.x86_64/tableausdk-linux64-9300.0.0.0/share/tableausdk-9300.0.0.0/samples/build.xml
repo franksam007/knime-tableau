@@ -1,0 +1,102 @@
+<!--
+  Build and Run the Tableau SDK samples.
+ -->
+<project name="TableauSDKDemos" default="usage">
+
+  <property name="local_lib_dir" value="../../../lib64/tableausdk" />
+  <property name="local_jar_dir" value="${local_lib_dir}/Java" />
+  <property name="global_lib_dir" value="/usr/lib64/tableausdk" />
+  <property name="global_jar_dir" value="${global_lib_dir}/Java" />
+
+  <!-- Print out the usage -->
+  <target name="usage">
+    <echo>
+      Usage: ant [target]
+
+      Top-level targets:
+        usage(default)           Generate this message
+        clean                    Clean up all the generated files
+        compileMakeOrder         Compile MakeOrder sample
+        runMakeOrder             Run MakeOrder sample
+        compilePublishOrder      Compile PublishOrder sample
+        runPublishOrder          Run PublishOrder sample
+
+    NOTE: To run the PublishOrder sample, you will need to modify the source file to
+          provide hostname, username, password, siteID; and possibly the extract file
+          path, the project name, and the data source name. Also a Tableau Server will
+          need to be installed and running on the hostname you specify, and admin
+          privilege is required. For details, please check our online documentation.
+    </echo>
+  </target>
+
+  <!-- Clean build/run artifacts -->
+  <target name="clean">
+    <delete dir="build" />
+    <delete file="order-java.tde" />
+    <delete>
+      <fileset dir="." includes="*.log" />
+    </delete>
+  </target>
+
+  <!-- Build the MakeOrder sample -->
+  <target name="compileMakeOrder">
+    <mkdir dir="build/classes" />
+    <javac
+      srcdir="."
+      destdir="build/classes"
+      includes="com/tableausoftware/demos/MakeOrder.java"
+      classpath="${local_jar_dir}/tableaucommon.jar:${local_jar_dir}/tableauextract.jar:${local_jar_dir}/jna.jar:${global_jar_dir}/tableaucommon.jar:${global_jar_dir}/tableauextract.jar:${global_jar_dir}/jna.jar"
+      source="1.7" target="1.7"
+      includeantruntime="false" />
+  </target>
+
+  <!-- Run the MakeOrder sample program -->
+  <target name="runMakeOrder" depends="compileMakeOrder,setRunProps">
+    <sequential>
+      <java
+        classname="com.tableausoftware.demos.MakeOrder"
+        classpath="build/classes:${local_jar_dir}/tableaucommon.jar:${local_jar_dir}/tableauextract.jar:${local_jar_dir}/jna.jar:${global_jar_dir}/tableaucommon.jar:${global_jar_dir}/tableauextract.jar:${global_jar_dir}/jna.jar"
+        fork="true">
+        <env key="${libPathKey}" path="${libPathValue}" />
+      </java>
+      <java
+        classname="com.tableausoftware.demos.MakeOrder"
+        classpath="build/classes:${local_jar_dir}/tableaucommon.jar:${local_jar_dir}/tableauextract.jar:${local_jar_dir}/jna.jar:${global_jar_dir}/tableaucommon.jar:${global_jar_dir}/tableauextract.jar:${global_jar_dir}/jna.jar"
+        fork="true">
+        <env key="${libPathKey}" path="${libPathValue}" />
+      </java>
+    </sequential>
+  </target>
+
+  <!-- Build the PublishOrder sample -->
+  <target name="compilePublishOrder">
+    <mkdir dir="build/classes" />
+    <javac
+      srcdir="."
+      destdir="build/classes"
+      includes="com/tableausoftware/demos/PublishOrder.java"
+      classpath="${local_jar_dir}/tableaucommon.jar:${local_jar_dir}/tableauserver.jar:${local_jar_dir}/jna.jar:${global_jar_dir}/tableaucommon.jar:${global_jar_dir}/tableauserver.jar:${global_jar_dir}/jna.jar"
+      source="1.7" target="1.7"
+      includeantruntime="false" />
+  </target>
+
+  <!-- Run the PublishOrder sample program -->
+  <target name="runPublishOrder" depends="compilePublishOrder,setRunProps">
+    <sequential>
+      <java
+        classname="com.tableausoftware.demos.PublishOrder"
+        classpath="build/classes:${local_jar_dir}/tableaucommon.jar:${local_jar_dir}/tableauserver.jar:${local_jar_dir}/jna.jar:${global_jar_dir}/tableaucommon.jar:${global_jar_dir}/tableauserver.jar:${global_jar_dir}/jna.jar"
+        fork="true">
+        <env key="${libPathKey}" path="${libPathValue}" />
+      </java>
+    </sequential>
+  </target>
+
+  <!-- Make sure the JVM can find the SDK libraries. -->
+  <target name="setRunProps">
+    <property environment="env" />
+    <property name="libPathKey" value="LD_LIBRARY_PATH" />
+    <property name="libPathValue" value="${env.LD_LIBRARY_PATH}:${local_lib_dir}:${global_lib_dir}" />
+  </target>
+
+</project>
