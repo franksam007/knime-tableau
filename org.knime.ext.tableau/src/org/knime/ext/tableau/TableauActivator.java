@@ -48,6 +48,8 @@
  */
 package org.knime.ext.tableau;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Paths;
 import java.util.Collections;
@@ -91,10 +93,17 @@ public final class TableauActivator implements BundleActivator {
                 LOGGER.errorWithFormat("Could not resolve URL \"%s\" relative to bundle \"%s\" as a local file "
                         + "(original path \"%s\")", url.toString(), pluginID, pathString);
             } else {
-                String folderPath = Paths.get(url.getFile()).normalize().toString();
-                LOGGER.debugWithFormat("Added tableau library path: \"%s\"", folderPath);
-                NativeLibrary.addSearchPath("TableauExtract", folderPath);
-                hasAtLeastOneContribution = true;
+                try {
+                    // must not use url.toURI() -- FileLocator leaves spaces in the URL (see eclipse bug 145096)
+                    java.nio.file.Path folderPath= Paths.get(new URI(url.getProtocol(), url.getFile(), null));
+                    folderPath = folderPath.normalize();
+                    LOGGER.debugWithFormat("Added tableau library path: \"%s\"", folderPath);
+                    NativeLibrary.addSearchPath("TableauExtract", folderPath.toString());
+                    hasAtLeastOneContribution = true;
+                } catch (URISyntaxException use) {
+                    LOGGER.error(String.format("Unable to resolve file from URL \"%s\": %s",
+                        url, use.getMessage(), use));
+                }
             }
         }
         if (!hasAtLeastOneContribution) {
