@@ -4,7 +4,7 @@
    <extension
          point="org.knime.ext.tableau">
       <libFolder
-            path="Tableau-SDK-9-3-0/Frameworks/">
+            path="Tableau-SDK-9-3-0/Frameworks/TableauExtract.framework/">
       </libFolder>
    </extension>
 
