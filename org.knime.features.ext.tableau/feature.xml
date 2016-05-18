@@ -735,6 +735,7 @@ propagated with or for interoperation with KNIME.
          version="0.0.0"
          unpack="false"/>
 
+<!--
    <plugin
          id="org.knime.ext.tableau.bin.linux.x86_64"
          os="linux"
@@ -761,5 +762,5 @@ propagated with or for interoperation with KNIME.
          install-size="0"
          version="0.0.0"
          fragment="true"/>
-
+-->
 </feature>
