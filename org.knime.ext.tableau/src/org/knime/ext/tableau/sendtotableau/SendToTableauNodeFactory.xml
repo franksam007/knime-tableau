@@ -9,7 +9,8 @@
     <fullDescription>
         <intro>
         	<p>
-            	Sends the input data to a Tableau Server.
+            	Sends the input data to a Tableau Server. The node is subject to change. For details on how to enable
+            	the Tableau SDK refer to the description of the Tableau Writer node.
         	</p>
        	</intro>
         <option name="Host">
