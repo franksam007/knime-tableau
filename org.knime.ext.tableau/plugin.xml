@@ -9,6 +9,13 @@
             factory-class="org.knime.ext.tableau.tdewrite.TableauDENodeFactory"
             id="org.knime.ext.tableau.tdewrite.TableauDENodeFactory">
       </node>
+      <node
+            after="org.knime.ext.tableau.tdewrite.TableauDENodeFactory"
+            category-path="/preview"
+            deprecated="false"
+            factory-class="org.knime.ext.tableau.sendtotableau.SendToTableauNodeFactory"
+            id="org.knime.ext.tableau.sendtotableau.SendToTableauNodeFactory">
+      </node>
       
       <!--TODO move to the proper plugin and proper category.-->
    </extension>

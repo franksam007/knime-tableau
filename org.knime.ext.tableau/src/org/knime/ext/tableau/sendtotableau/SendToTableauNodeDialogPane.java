@@ -46,7 +46,7 @@
  * History
  *   Feb 5, 2016 (wiswedel): created
  */
-package org.knime.ext.tableau;
+package org.knime.ext.tableau.sendtotableau;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;

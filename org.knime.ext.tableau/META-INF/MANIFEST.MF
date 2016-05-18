@@ -17,4 +17,5 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ActivationPolicy: lazy
 Bundle-Activator: org.knime.ext.tableau.TableauActivator
 Export-Package: org.knime.ext.tableau,
+ org.knime.ext.tableau.sendtotableau,
  org.knime.ext.tableau.tdewrite
