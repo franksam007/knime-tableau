@@ -755,7 +755,7 @@ propagated with or for interoperation with KNIME.
 
    <plugin
          id="org.knime.ext.tableau.bin.macosx.x86_64"
-         os="linux,macosx"
+         os="macosx"
          arch="x86_64"
          download-size="0"
          install-size="0"
