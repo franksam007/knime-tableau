@@ -50,17 +50,8 @@ package org.knime.ext.tableau.sendtotableau;
 
 import java.io.File;
 import java.io.IOException;
-import java.security.KeyManagementException;
-import java.security.NoSuchAlgorithmException;
-import java.security.cert.X509Certificate;
 
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSession;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
-
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.knime.core.data.DataRow;
 import org.knime.core.data.DataTableSpec;
@@ -73,6 +64,7 @@ import org.knime.core.node.NodeModel;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.util.CheckUtils;
+import org.knime.core.util.FileUtil;
 import org.knime.ext.tableau.TableauTableWriter;
 
 import com.tableausoftware.extract.ExtractAPI;
@@ -98,69 +90,49 @@ final class SendToTableauNodeModel extends NodeModel {
         return new DataTableSpec[]{};
     }
 
-    private static void disableSSL() throws NoSuchAlgorithmException, KeyManagementException {
-        TrustManager[] trustAllCerts = new TrustManager[] {new X509TrustManager() {
-            @Override
-            public java.security.cert.X509Certificate[] getAcceptedIssuers() {
-                return null;
-            }
-            @Override
-            public void checkClientTrusted(final X509Certificate[] certs, final String authType) {
-            }
-            @Override
-            public void checkServerTrusted(final X509Certificate[] certs, final String authType) {
-            }
-        }
-        };
-        SSLContext sc = SSLContext.getInstance("SSL");
-        sc.init(null, trustAllCerts, new java.security.SecureRandom());
-        HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
-
-        HostnameVerifier allHostsValid = new HostnameVerifier() {
-            @Override
-            public boolean verify(final String hostname, final SSLSession session) {
-                return true;
-            }
-        };
-        HttpsURLConnection.setDefaultHostnameVerifier(allHostsValid);
-    }
-
     /** {@inheritDoc} */
     @Override
     protected BufferedDataTable[] execute(final BufferedDataTable[] inData,
         final ExecutionContext exec) throws Exception {
         SendToTableauSettings s = m_settings;
-        File t = File.createTempFile("tableau-", ".tde");
-        disableSSL();
         BufferedDataTable table = inData[0];
         long rowIndex = 0L;
         final long rowCount = table.size();
-        ExtractAPI.initialize();
-        ServerAPI.initialize();
-        try (TableauTableWriter tableWriter = TableauTableWriter.create(t.getAbsolutePath(),
-            table.getDataTableSpec())) {
-            // This part works ok
-            for (DataRow r : table) {
-                tableWriter.addRow(r);
-                exec.setProgress((double)++rowIndex / rowCount, String.format("Row %d/%d (\"%s\")",
-                    rowIndex, rowCount, r.getKey().toString()));
+        File t = FileUtil.createTempFile("tableau-", ".tde");
+        t.delete(); // just need a unique file name -- must not exist
+        try {
+            getLogger().debugWithFormat("Will write temporary tableau file to \"%s\"", t.getAbsolutePath());
+            ExtractAPI.initialize();
+            try (TableauTableWriter tableWriter = TableauTableWriter.create(t.getAbsolutePath(),
+                table.getDataTableSpec())) {
+                // This part works ok
+                for (DataRow r : table) {
+                    tableWriter.addRow(r);
+                    exec.setProgress((double)++rowIndex / rowCount, String.format("Row %d/%d (\"%s\")",
+                        rowIndex, rowCount, r.getKey().toString()));
+                }
+                getLogger().debugWithFormat("Successfully written temporary tableau file (\"%s\" - %s)",
+                    t.getAbsolutePath(), FileUtils.byteCountToDisplaySize(FileUtils.sizeOf(t)));
+            } finally {
+                ExtractAPI.cleanup();
             }
-            // and here is where it causes weird errors
-            ServerConnection serverConnection = new ServerConnection();
-            serverConnection.connect(s.getHost(), s.getUsername(), s.getPassword(), s.getSiteID());
+            ServerConnection serverConnection = null;
+            ServerAPI.initialize();
             try {
+                serverConnection = new ServerConnection();
+                serverConnection.connect(s.getHost(), s.getUsername(), s.getPassword(), s.getSiteID());
                 if (StringUtils.isNotEmpty(s.getProxyUsername())) {
                     serverConnection.setProxyCredentials(s.getProxyUsername(), s.getProxyPassword());
                 }
                 serverConnection.publishExtract(t.getAbsolutePath(), s.getProjectName(),
                     s.getDatasourceName(), s.isOverwrite());
             } finally {
-                serverConnection.disconnect();
+                if (serverConnection != null) {
+                    serverConnection.disconnect();
+                }
             }
         } finally {
             t.delete();
-            ServerAPI.cleanup();
-            ExtractAPI.cleanup();
         }
         return new BufferedDataTable[] {};
     }
