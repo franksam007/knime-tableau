@@ -4,23 +4,22 @@
 
    <extension point="org.knime.workbench.repository.nodes">
       <node
-            category-path="/preview"
+            category-path="/labs/tableau"
             deprecated="false"
             factory-class="org.knime.ext.tableau.tdewrite.TableauDENodeFactory"
             id="org.knime.ext.tableau.tdewrite.TableauDENodeFactory">
       </node>
       <node
             after="org.knime.ext.tableau.tdewrite.TableauDENodeFactory"
-            category-path="/preview"
+            category-path="/labs/tableau"
             deprecated="false"
             factory-class="org.knime.ext.tableau.sendtotableau.SendToTableauNodeFactory"
             id="org.knime.ext.tableau.sendtotableau.SendToTableauNodeFactory">
       </node>
-      
-      <!--TODO move to the proper plugin and proper category.-->
    </extension>
+      
    <extension point="org.knime.workbench.repository.categories">
-      <category description="KNIME Preview nodes -- part of future KNIME releases" icon="icons/preview.png" level-id="preview" name="Preview" path="/">
+      <category description="KNIME Tableau Integration" icon="icons/tableau_category.png" level-id="tableau" name="Tableau" path="/labs">
       </category>
    </extension>
  
