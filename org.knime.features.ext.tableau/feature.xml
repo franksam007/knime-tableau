@@ -735,32 +735,10 @@ propagated with or for interoperation with KNIME.
          version="0.0.0"
          unpack="false"/>
 
-<!--
    <plugin
          id="org.knime.ext.tableau.bin.linux.x86_64"
-         os="linux"
-         arch="x86_64"
          download-size="0"
          install-size="0"
-         version="0.0.0"
-         fragment="true"/>
+         version="0.0.0"/>
 
-   <plugin
-         id="org.knime.ext.tableau.bin.win32.x86_64"
-         os="win32"
-         arch="x86_64"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         fragment="true"/>
-
-   <plugin
-         id="org.knime.ext.tableau.bin.macosx.x86_64"
-         os="macosx"
-         arch="x86_64"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         fragment="true"/>
--->
 </feature>
