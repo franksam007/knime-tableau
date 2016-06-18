@@ -5,16 +5,12 @@
    <extension point="org.knime.workbench.repository.nodes">
       <node
             category-path="/labs/tableau"
-            deprecated="false"
-            factory-class="org.knime.ext.tableau.tdewrite.TableauDENodeFactory"
-            id="org.knime.ext.tableau.tdewrite.TableauDENodeFactory">
+            factory-class="org.knime.ext.tableau.tdewrite.TableauDENodeFactory">
       </node>
       <node
             after="org.knime.ext.tableau.tdewrite.TableauDENodeFactory"
             category-path="/labs/tableau"
-            deprecated="false"
-            factory-class="org.knime.ext.tableau.sendtotableau.SendToTableauNodeFactory"
-            id="org.knime.ext.tableau.sendtotableau.SendToTableauNodeFactory">
+            factory-class="org.knime.ext.tableau.sendtotableau.SendToTableauNodeFactory">
       </node>
    </extension>
       
