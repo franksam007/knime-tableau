@@ -1,9 +1,15 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Tableau binaries for 64bit Linux
-Bundle-SymbolicName: org.knime.ext.tableau.bin.linux.x86_64;singleton:=true
-Bundle-Version: 3.1.0.qualifier
-Fragment-Host: org.knime.ext.tableau;bundle-version="3.1.0.qualifier"
+Bundle-SymbolicName:  org.knime.ext.tableau.bin.linux.x86_64;singleton:=true
+Bundle-Version: 9.3.1.qualifier
 Eclipse-PlatformFilter: (&(osgi.os=linux)(osgi.arch=x86_64))
+Bundle-ClassPath: .,
+ lib/jna.jar,
+ lib/tableaucommon.jar,
+ lib/tableauextract.jar,
+ lib/tableauserver.jar
 Bundle-Vendor: KNIME GmbH, Konstanz, Germany
-Bundle-ClassPath: tableau-lib-linux64.jar
+Require-Bundle: org.knime.ext.tableau;bundle-version="[3.1.0,4.0.0)"
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Bundle-ActivationPolicy: lazy
