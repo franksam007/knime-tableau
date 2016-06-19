@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
-      id="org.knime.features.ext.tableau"
-      label="KNIME Tableau integration"
+      id="org.knime.features.ext.tableau.bin"
+      label="KNIME Tableau SDK (Linux/Mac) - Experimental"
       version="3.2.0.qualifier"
-      provider-name="KNIME GmbH, Konstanz, Germany"
-      plugin="org.knime.ext.tableau">
+      provider-name="KNIME GmbH, Konstanz, Germany">
 
    <description>
-      KNIME extension offering Tableau integration.
+      Tableau SDK packages for Linux and Mac. These binaries are required for the KNIME Tableau nodes to work, whereby the recommended path is to download the SDK separately and set environment variables accordingly (see Tableau SDK web page or node description of the respective nodes). This extensions saves this step.
+
+This package is experimental and interferes with the Tableau SDK bootstrap code. It&apos;s currently not available for Windows systems (though installation of this extension is possible as it&apos;s &apos;blank&apos; for Windows).
    </description>
 
    <copyright>
@@ -729,10 +730,28 @@ propagated with or for interoperation with KNIME.
    </license>
 
    <plugin
-         id="org.knime.ext.tableau"
+         id="org.knime.ext.tableau.bin.linux.x86_64"
+         os="linux"
+         arch="x86_64"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"/>
+
+   <plugin
+         id="org.knime.ext.tableau.bin.macosx.x86_64"
+         os="macosx"
+         arch="x86_64"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"/>
+
+   <plugin
+         id="org.knime.ext.tableau.bin.win32.x86_64"
+         os="win32"
+         arch="x86_64"
          download-size="0"
          install-size="0"
          version="0.0.0"
-         unpack="false"/>
+         fragment="true"/>
 
 </feature>
