@@ -99,6 +99,7 @@ public final class TableauActivator implements BundleActivator {
                     folderPath = folderPath.normalize();
                     LOGGER.debugWithFormat("Added tableau library path: \"%s\"", folderPath);
                     NativeLibrary.addSearchPath("TableauExtract", folderPath.toString());
+                    NativeLibrary.addSearchPath("TableauServer", folderPath.toString());
                     hasAtLeastOneContribution = true;
                 } catch (URISyntaxException use) {
                     LOGGER.error(String.format("Unable to resolve file from URL \"%s\": %s",
