@@ -10,6 +10,6 @@ Bundle-ClassPath: .,
  lib/tableauextract.jar,
  lib/tableauserver.jar
 Bundle-Vendor: KNIME GmbH, Konstanz, Germany
-Require-Bundle: org.knime.ext.tableau;bundle-version="[3.1.0,4.0.0)"
+Require-Bundle: org.knime.ext.tableau;bundle-version="[3.2.0,4.0.0)"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ActivationPolicy: lazy
