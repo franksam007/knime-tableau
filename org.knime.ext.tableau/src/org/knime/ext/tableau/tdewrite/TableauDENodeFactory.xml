@@ -11,30 +11,32 @@
         	<p>Writes the input table as Tableau Data Extract (TDE) file. This node uses the Tableau SDK library to
         	   write the file.</p>
         	<p>In order to use this library the user needs to perform the installation steps as described on the 
-        	Tableau SDK website (see below).
+        	Tableau SDK website (see below). The KNIME update site provides (experimental) Tableau binary packages, 
+            which make the steps described below unnecessary.
         	</p>
        	</intro>
        	<tab name="Main Configuration">
-        <option name="Output Location">Choose the file to write to.</option>
-        <option name="Overwrite OK">If selected, the node will refuse to overwrite the file if it already exists (execution will fail)</option>
+            <option name="Output Location">Choose the file to write to.</option>
+            <option name="Overwrite OK">If selected, the node will refuse to overwrite the file if it already exists (execution will fail)</option>
        	</tab>
+        <!-- This is copied in the tableau server writer node. -->
        	<tab name="Installation">
-       	<option name="">
-       	<ol>
-       	   <li>Download the Java version of the <a href="https://onlinehelp.tableau.com/current/api/sdk/en-us/help.htm#SDK/tableau_sdk_installing.htm%3FTocPath%3D_____3">
-            Tableau SDK</a> for your system (Windows, Mac, or Linux).</li>
-       	   <li>Extract the archive to a location of your choice.</li>
-       	   <li>Update environment variables such as PATH on your system (see 
-       	       <a href="https://onlinehelp.tableau.com/current/api/sdk/en-us/help.htm#SDK/tableau_sdk_using_java_eclipse.htm%3FTocPath%3D_____5">
-                  here</a>). If you are not familiar with setting variables on Windows, have a look at 
-                  <a href="http://www.computerhope.com/issues/ch000549.htm">this page</a>.</li>
-       	   <li>On Windows systems: The TAB_SDK_LOGDIR and TAB_SDK_TMPDIR environment variables must be set 
-       	       (the documentation suggests this is optional but it is not)</li>
-      	   <li>On Windows systems:The library relies on the "Microsoft Visual Basic 2013 Redistributables" to be installed on the 
-       	       system (for download from <a href="https://www.microsoft.com/en-US/download/details.aspx?id=40784">
-       	       microsoft.com</a>)</li>
-       	</ol>
-       	</option>
+           	<option name="">
+               	<ol>
+               	   <li>Download the Java version of the <a href="https://onlinehelp.tableau.com/current/api/sdk/en-us/help.htm#SDK/tableau_sdk_installing.htm%3FTocPath%3D_____3">
+                    Tableau SDK</a> for your system (Windows, Mac, or Linux).</li>
+               	   <li>Extract the archive to a location of your choice.</li>
+               	   <li>Update environment variables such as PATH on your system (see 
+               	       <a href="https://onlinehelp.tableau.com/current/api/sdk/en-us/help.htm#SDK/tableau_sdk_using_java_eclipse.htm%3FTocPath%3D_____5">
+                          here</a>). If you are not familiar with setting variables on Windows, have a look at 
+                          <a href="http://www.computerhope.com/issues/ch000549.htm">this page</a>.</li>
+               	   <li>On Windows systems: The TAB_SDK_LOGDIR and TAB_SDK_TMPDIR environment variables must be set 
+               	       (the documentation suggests this is optional but it is not)</li>
+              	   <li>On Windows systems:The library relies on the "Microsoft Visual Basic 2013 Redistributables" to be installed on the 
+               	       system (for download from <a href="https://www.microsoft.com/en-US/download/details.aspx?id=40784">
+               	       microsoft.com</a>)</li>
+               	</ol>
+           	</option>
        	</tab>
     </fullDescription>
     <ports>
