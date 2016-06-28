@@ -114,6 +114,8 @@ final class TableauDENodeModel extends NodeModel {
                     exec.setProgress((double)++rowIndex / rowCount, String.format("Row %d/%d (\"%s\")",
                         rowIndex, rowCount, r.getKey().toString()));
                 }
+            } catch (UnsatisfiedLinkError e) {
+                throw new Exception(e.getMessage() + " (follow \"Installation\" steps described in node description)", e);
             } finally {
                 ExtractAPI.cleanup();
             }

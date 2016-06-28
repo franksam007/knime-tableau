@@ -131,6 +131,8 @@ final class SendToTableauNodeModel extends NodeModel {
                     serverConnection.disconnect();
                 }
             }
+        } catch (UnsatisfiedLinkError e) {
+            throw new Exception(e.getMessage() + " (follow \"Installation\" steps described in node description)", e);
         } finally {
             t.delete();
         }
