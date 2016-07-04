@@ -2,6 +2,12 @@
 <?eclipse version="3.2"?>
 <plugin>
     <extension point="org.knime.ext.tableau">
-        <libFolder path="tableausdk-linux64-9300.0.0.0/lib64/tableausdk/" />
+        <libFolder name="TableauExtract" path="tableausdk-linux64-9300.0.0.0/lib64/tableausdk/" />
+    </extension>
+    <extension point="org.knime.ext.tableau">
+        <libFolder name="TableauServer" path="tableausdk-linux64-9300.0.0.0/lib64/tableausdk/" />
+    </extension>
+    <extension point="org.knime.ext.tableau">
+        <libFolder name="TableauCommon" path="tableausdk-linux64-9300.0.0.0/lib64/tableausdk/" />
     </extension>
 </plugin>

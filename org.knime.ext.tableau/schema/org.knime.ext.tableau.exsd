@@ -49,7 +49,14 @@
 
    <element name="libFolder">
       <complexType>
-         <attribute name="path" type="string">
+         <attribute name="name" type="string" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="path" type="string" use="required">
             <annotation>
                <documentation>
                   Plug-in relative path to lib folder.

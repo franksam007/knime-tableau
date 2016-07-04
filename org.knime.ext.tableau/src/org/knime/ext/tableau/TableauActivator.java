@@ -68,6 +68,10 @@ import org.osgi.framework.BundleContext;
 
 import com.sun.jna.NativeLibrary;
 
+/**
+ * Activator for Tableau Plugin
+ * @author wiswedel
+ */
 public final class TableauActivator implements BundleActivator {
 
     private static final NodeLogger LOGGER = NodeLogger.getLogger(TableauActivator.class);
@@ -82,6 +86,10 @@ public final class TableauActivator implements BundleActivator {
             ext -> Stream.of(ext.getConfigurationElements())).iterator(); it.hasNext(); ) {
             IConfigurationElement element = it.next();
             String pluginID = element.getContributor().getName();
+            String libName = element.getAttribute("name");
+            if (libName == null || libName.isEmpty()) {
+                LOGGER.errorWithFormat("Tableau library name cannot be empty in plug-in %s.", pluginID);
+            }
             String pathString = element.getAttribute("path");
             Path path = new Path(pathString);
             URL url = FileLocator.find(Platform.getBundle(pluginID), path, Collections.emptyMap());
@@ -98,8 +106,7 @@ public final class TableauActivator implements BundleActivator {
                     java.nio.file.Path folderPath= Paths.get(new URI(url.getProtocol(), url.getFile(), null));
                     folderPath = folderPath.normalize();
                     LOGGER.debugWithFormat("Added tableau library path: \"%s\"", folderPath);
-                    NativeLibrary.addSearchPath("TableauExtract", folderPath.toString());
-                    NativeLibrary.addSearchPath("TableauServer", folderPath.toString());
+                    NativeLibrary.addSearchPath(libName, folderPath.toString());
                     hasAtLeastOneContribution = true;
                 } catch (URISyntaxException use) {
                     LOGGER.error(String.format("Unable to resolve file from URL \"%s\": %s",

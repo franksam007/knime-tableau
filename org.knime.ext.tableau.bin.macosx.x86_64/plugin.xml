@@ -2,13 +2,23 @@
 <?eclipse version="3.2"?>
 <plugin>
    <extension point="org.knime.ext.tableau">
-      <libFolder path="Tableau-SDK-9-3-1/Frameworks/TableauExtract.framework/">
+      <libFolder
+            name="TableauExtract"
+            path="Tableau-SDK-9-3-1/Frameworks/TableauExtract.framework/">
       </libFolder>
    </extension>
    <extension
          point="org.knime.ext.tableau">
       <libFolder
+            name="TableauServer"
             path="Tableau-SDK-9-3-1/Frameworks/TableauServer.framework/">
+      </libFolder>
+   </extension>
+   <extension
+         point="org.knime.ext.tableau">
+      <libFolder
+            name="TableauCommon"
+            path="Tableau-SDK-9-3-1/Frameworks/TableauCommon.framework/">
       </libFolder>
    </extension>
 </plugin>
