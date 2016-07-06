@@ -56,6 +56,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.stream.Stream;
 
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtensionPoint;
@@ -87,8 +88,9 @@ public final class TableauActivator implements BundleActivator {
             IConfigurationElement element = it.next();
             String pluginID = element.getContributor().getName();
             String libName = element.getAttribute("name");
-            if (libName == null || libName.isEmpty()) {
+            if (StringUtils.isEmpty(libName)) {
                 LOGGER.errorWithFormat("Tableau library name cannot be empty in plug-in %s.", pluginID);
+                continue;
             }
             String pathString = element.getAttribute("path");
             Path path = new Path(pathString);
