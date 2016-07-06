@@ -53,7 +53,6 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 
 import javax.swing.JCheckBox;
-import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
@@ -78,7 +77,7 @@ final class TableauDEWriteNodeDialogPane extends NodeDialogPane {
     TableauDEWriteNodeDialogPane() {
         m_filePanel = new FilesHistoryPanel(createFlowVariableModel(TableauDESettings.CFG_OUTPUT_LOCATION, Type.STRING),
                     "org.knime.ext.tableau.tdewrite", LocationValidation.FileOutput, ".tde", ".TDE");
-        m_filePanel.setDialogType(JFileChooser.SAVE_DIALOG);
+        m_filePanel.setDialogTypeSaveWithExtension(".tde");
         m_overwriteChecker = new JCheckBox("Overwrite OK");
         addTab("TDE Settings", initPanel());
     }
@@ -122,6 +121,7 @@ final class TableauDEWriteNodeDialogPane extends NodeDialogPane {
     @Override
     protected void loadSettingsFrom(final NodeSettingsRO settings, final DataTableSpec[] specs) {
         TableauDESettings s = new TableauDESettings().loadSettingsInDialog(settings);
+        m_filePanel.updateHistory();
         m_filePanel.setSelectedFile(s.getOutputLocation());
         m_overwriteChecker.setSelected(s.isOverwriteOK());
     }
