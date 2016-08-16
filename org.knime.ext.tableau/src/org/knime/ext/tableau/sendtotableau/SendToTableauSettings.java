@@ -166,7 +166,7 @@ final class SendToTableauSettings {
         m_password = settings.getPassword("password-enc", "tableau-knime");
 
         m_siteID = settings.getString("siteID");
-        CheckUtils.checkSetting(StringUtils.isNotEmpty(m_siteID), "SiteID must not be empty");
+        CheckUtils.checkSetting(m_siteID != null, "SiteID must not be null");
 
 
         m_projectName = settings.getString("projectName");
