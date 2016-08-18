@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: KNIME Tableau Integration
 Bundle-SymbolicName: org.knime.ext.tableau;singleton:=true
-Bundle-Version: 3.2.0.qualifier
+Bundle-Version: 3.2.1.qualifier
 Bundle-ClassPath: .,
  lib/jna.jar,
  lib/tableaucommon.jar,
