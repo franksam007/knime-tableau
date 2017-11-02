@@ -3,7 +3,7 @@
       id="org.knime.features.ext.tableau.bin"
       label="KNIME Tableau SDK (Linux/Mac) - Experimental"
       version="3.5.0.qualifier"
-      provider-name="KNIME GmbH, Konstanz, Germany">
+      provider-name="KNIME AG, Zurich, Switzerland">
 
    <description>
       Tableau SDK packages for Linux and Mac. These binaries are required for the KNIME Tableau nodes to work, whereby the recommended path is to download the SDK separately and set environment variables accordingly (see Tableau SDK web page or node description of the respective nodes). This extensions saves this step.
@@ -12,7 +12,7 @@ This package is experimental and interferes with the Tableau SDK bootstrap code.
    </description>
 
    <copyright>
-      Copyright by KNIME GmbH, Konstanz, Germany
+      Copyright by KNIME AG, Zurich, Switzerland
    </copyright>
 
    <license>
