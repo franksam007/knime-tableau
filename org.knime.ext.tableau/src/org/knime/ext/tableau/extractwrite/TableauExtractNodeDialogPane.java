@@ -51,6 +51,7 @@ package org.knime.ext.tableau.extractwrite;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.util.Arrays;
 
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
@@ -77,6 +78,8 @@ public final class TableauExtractNodeDialogPane extends NodeDialogPane {
 
     private final JCheckBox m_overwriteChecker;
 
+    private final String[] m_fileExtensions;
+
     /**
      * Creates a new Dialog for a Tableau extract writer.
      *
@@ -84,7 +87,7 @@ public final class TableauExtractNodeDialogPane extends NodeDialogPane {
      * @param fileExtensions the allowed file extensions for the extract file
      */
     public TableauExtractNodeDialogPane(final String historyId, final String... fileExtensions) {
-        // TODO force extension -> do not close with wrong extension
+        m_fileExtensions = fileExtensions;
         m_filePanel =
             new FilesHistoryPanel(createFlowVariableModel(TableauExtractSettings.CFG_OUTPUT_LOCATION, Type.STRING),
                 historyId, LocationValidation.FileOutput, fileExtensions);
@@ -135,6 +138,16 @@ public final class TableauExtractNodeDialogPane extends NodeDialogPane {
 
     @Override
     protected void saveSettingsTo(final NodeSettingsWO settings) throws InvalidSettingsException {
+        // Check if the file path ends with one of the given valid extensions
+        if (Arrays.stream(m_fileExtensions).noneMatch(e -> m_filePanel.getSelectedFile().endsWith(e))) {
+            if (m_fileExtensions.length == 1) {
+                throw new InvalidSettingsException(
+                    "The file must end with the extension '" + m_fileExtensions[0] + "'.");
+            } else {
+                throw new InvalidSettingsException(
+                    "The file must end with one of the extensions [" + String.join(",", m_fileExtensions) + "].");
+            }
+        }
         final TableauExtractSettings s = new TableauExtractSettings();
         s.setOutputLocation(m_filePanel.getSelectedFile());
         s.setOverwriteOK(m_overwriteChecker.isSelected());
