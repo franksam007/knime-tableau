@@ -44,40 +44,34 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   Oct 5, 2018 (bw): created
+ *   Mar 28, 2016 (wiswedel): created
  */
-package org.knime.ext.tableau;
+package org.knime.ext.tableau.hyper;
 
-import com.tableausoftware.TableauException;
-import com.tableausoftware.hyperextract.ExtractAPI;
+import org.knime.core.node.NodeLogger;
+import org.osgi.framework.BundleActivator;
+import org.osgi.framework.BundleContext;
 
 /**
+ * Activator for Tableau binary Plugin
  *
  * @author Benjamin Wilhelm, KNIME GmbH, Konstanz, Germany
  */
-public class TableauHyperExtractAPI implements TableauExtractAPI {
+public final class TableauHyperActivator implements BundleActivator {
+
+    private static final NodeLogger LOGGER = NodeLogger.getLogger(TableauHyperActivator.class);
 
     @Override
-    public Class<?> getExtractAPIClass() {
-        return ExtractAPI.class;
+    public void start(final BundleContext context) throws Exception {
+        // TODO set the library path
+        // Option 1:
+        // - Like in org.knime.ext.tableau.TableauActivator
+        // Option 2:
+        // - Set jna.path.library variable
     }
 
     @Override
-    public void initialize() throws WrappingTableauException {
-        try {
-            ExtractAPI.initialize();
-        } catch (final TableauException e) {
-            throw new WrappingTableauException(e);
-        }
-    }
-
-    @Override
-    public void cleanup() throws WrappingTableauException {
-        try {
-            ExtractAPI.cleanup();
-        } catch (final TableauException e) {
-            throw new WrappingTableauException(e);
-        }
+    public void stop(final BundleContext context) throws Exception {
     }
 
 }

@@ -44,50 +44,43 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   Feb 5, 2016 (wiswedel): created
+ *   Oct 5, 2018 (bw): created
  */
-package org.knime.ext.tableau.hyperwrite;
+package org.knime.ext.tableau.hyper;
 
-import org.knime.core.node.NodeDialogPane;
-import org.knime.core.node.NodeFactory;
-import org.knime.core.node.NodeView;
-import org.knime.ext.tableau.TableauHyperExtractAPI;
-import org.knime.ext.tableau.TableauHyperExtractWriter;
-import org.knime.ext.tableau.extractwrite.TableauExtractNodeDialogPane;
-import org.knime.ext.tableau.extractwrite.TableauExtractNodeModel;
+import org.knime.ext.tableau.TableauExtractAPI;
+import org.knime.ext.tableau.WrappingTableauException;
+
+import com.tableausoftware.TableauException;
+import com.tableausoftware.hyperextract.ExtractAPI;
 
 /**
- * Factory for the Tableau Hyper Writer node.
  *
- * @author Bernd Wiswedel, KNIME AG, Zurich, Switzerland
  * @author Benjamin Wilhelm, KNIME GmbH, Konstanz, Germany
  */
-public final class TableauHyperWriterNodeFactory extends NodeFactory<TableauExtractNodeModel> {
+public class TableauHyperExtractAPI implements TableauExtractAPI {
 
     @Override
-    public TableauExtractNodeModel createNodeModel() {
-        return new TableauExtractNodeModel(new TableauHyperExtractAPI(),
-            new TableauHyperExtractWriter.TableauTDEExtractCreator());
+    public Class<?> getExtractAPIClass() {
+        return ExtractAPI.class;
     }
 
     @Override
-    protected int getNrNodeViews() {
-        return 0;
+    public void initialize() throws WrappingTableauException {
+        try {
+            ExtractAPI.initialize();
+        } catch (final TableauException e) {
+            throw new WrappingTableauException(e);
+        }
     }
 
     @Override
-    public NodeView<TableauExtractNodeModel> createNodeView(final int viewIndex,
-        final TableauExtractNodeModel nodeModel) {
-        return null;
+    public void cleanup() throws WrappingTableauException {
+        try {
+            ExtractAPI.cleanup();
+        } catch (final TableauException e) {
+            throw new WrappingTableauException(e);
+        }
     }
 
-    @Override
-    protected boolean hasDialog() {
-        return true;
-    }
-
-    @Override
-    protected NodeDialogPane createNodeDialogPane() {
-        return new TableauExtractNodeDialogPane("org.knime.ext.tableau.hyperwrite", ".hyper");
-    }
 }

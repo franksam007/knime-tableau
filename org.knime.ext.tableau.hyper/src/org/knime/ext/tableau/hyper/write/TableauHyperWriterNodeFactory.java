@@ -46,25 +46,28 @@
  * History
  *   Feb 5, 2016 (wiswedel): created
  */
-package org.knime.ext.tableau.tdewrite;
+package org.knime.ext.tableau.hyper.write;
 
 import org.knime.core.node.NodeDialogPane;
 import org.knime.core.node.NodeFactory;
 import org.knime.core.node.NodeView;
-import org.knime.ext.tableau.TableauTDEExtractAPI;
-import org.knime.ext.tableau.TableauTDEExtractWriter;
 import org.knime.ext.tableau.extractwrite.TableauExtractNodeDialogPane;
 import org.knime.ext.tableau.extractwrite.TableauExtractNodeModel;
+import org.knime.ext.tableau.hyper.TableauHyperExtractAPI;
+import org.knime.ext.tableau.hyper.TableauHyperExtractWriter;
 
 /**
+ * Factory for the Tableau Hyper Writer node.
+ *
+ * @author Bernd Wiswedel, KNIME AG, Zurich, Switzerland
  * @author Benjamin Wilhelm, KNIME GmbH, Konstanz, Germany
  */
-public final class TableauDENodeFactory extends NodeFactory<TableauExtractNodeModel> {
+public final class TableauHyperWriterNodeFactory extends NodeFactory<TableauExtractNodeModel> {
 
     @Override
     public TableauExtractNodeModel createNodeModel() {
-        return new TableauExtractNodeModel(new TableauTDEExtractAPI(),
-            new TableauTDEExtractWriter.TableauTDEExtractCreator());
+        return new TableauExtractNodeModel(new TableauHyperExtractAPI(),
+            new TableauHyperExtractWriter.TableauTDEExtractCreator());
     }
 
     @Override
@@ -85,7 +88,6 @@ public final class TableauDENodeFactory extends NodeFactory<TableauExtractNodeMo
 
     @Override
     protected NodeDialogPane createNodeDialogPane() {
-        return new TableauExtractNodeDialogPane("org.knime.ext.tableau.tdewrite", ".tde");
+        return new TableauExtractNodeDialogPane("org.knime.ext.tableau.hyperwrite", ".hyper");
     }
-
 }

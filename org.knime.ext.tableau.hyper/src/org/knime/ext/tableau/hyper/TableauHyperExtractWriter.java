@@ -46,7 +46,7 @@
  * History
  *   Feb 5, 2016 (wiswedel): created
  */
-package org.knime.ext.tableau;
+package org.knime.ext.tableau.hyper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -61,20 +61,23 @@ import org.knime.core.data.DataType;
 import org.knime.core.data.DoubleValue;
 import org.knime.core.data.IntValue;
 import org.knime.core.data.StringValue;
+import org.knime.ext.tableau.TableauExtractCreator;
+import org.knime.ext.tableau.TableauExtractWriter;
+import org.knime.ext.tableau.WrappingTableauException;
 
 import com.tableausoftware.TableauException;
 import com.tableausoftware.common.Collation;
 import com.tableausoftware.common.Type;
-import com.tableausoftware.extract.Extract;
-import com.tableausoftware.extract.Row;
-import com.tableausoftware.extract.Table;
-import com.tableausoftware.extract.TableDefinition;
+import com.tableausoftware.hyperextract.Extract;
+import com.tableausoftware.hyperextract.Row;
+import com.tableausoftware.hyperextract.Table;
+import com.tableausoftware.hyperextract.TableDefinition;
 
 /**
  * @author Bernd Wiswedel, KNIME AG, Zurich, Switzerland
  * @author Benjamin Wilhelm, KNIME GmbH, Konstanz, Germany
  */
-public final class TableauTDEExtractWriter implements TableauExtractWriter {
+public final class TableauHyperExtractWriter implements TableauExtractWriter {
 
     private Table m_table;
 
@@ -82,7 +85,7 @@ public final class TableauTDEExtractWriter implements TableauExtractWriter {
 
     private Extract m_extract;
 
-    private TableauTDEExtractWriter(final TableauTypeSetter[] typeSetters, final String path)
+    private TableauHyperExtractWriter(final TableauTypeSetter[] typeSetters, final String path)
         throws WrappingTableauException {
         try {
             m_typeSetters = typeSetters;
@@ -120,7 +123,7 @@ public final class TableauTDEExtractWriter implements TableauExtractWriter {
     }
 
     /**
-     * A {@link TableauExtractCreator} which uses the tableausdk and writes to tde files.
+     * A {@link TableauExtractCreator} which uses the Extract API 2.0 and writes to hyper files.
      */
     public static class TableauTDEExtractCreator implements TableauExtractCreator {
 
@@ -135,7 +138,7 @@ public final class TableauTDEExtractWriter implements TableauExtractWriter {
                     typeSetters.add(tableType.get());
                 }
             }
-            return new TableauTDEExtractWriter(typeSetters.toArray(new TableauTypeSetter[0]), path);
+            return new TableauHyperExtractWriter(typeSetters.toArray(new TableauTypeSetter[0]), path);
         }
 
         private static Optional<TableauTypeSetter> toTableType(final DataColumnSpec colSpec, final int colIndex) {

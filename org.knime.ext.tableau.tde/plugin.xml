@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?eclipse version="3.2"?><plugin>
+
+   <extension-point id="org.knime.ext.tableau" name="tableauLibFolder" schema="schema/org.knime.ext.tableau.exsd"/>
+
+   <extension point="org.knime.workbench.repository.nodes">
+      <node
+            category-path="/labs/tableau"
+            factory-class="org.knime.ext.tableau.tde.write.TableauDENodeFactory">
+      </node>
+      <node
+            after="org.knime.ext.tableau.tdewrite.TableauDENodeFactory"
+            category-path="/labs/tableau"
+            factory-class="org.knime.ext.tableau.tde.sendtotableau.SendToTableauNodeFactory">
+      </node>
+   </extension>
+ 
+</plugin>

@@ -46,7 +46,7 @@
  * History
  *   Feb 5, 2016 (wiswedel): created
  */
-package org.knime.ext.tableau.sendtotableau;
+package org.knime.ext.tableau.tde.sendtotableau;
 
 import org.apache.commons.lang3.StringUtils;
 import org.knime.core.node.InvalidSettingsException;

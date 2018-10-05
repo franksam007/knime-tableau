@@ -44,40 +44,48 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   Oct 5, 2018 (bw): created
+ *   Feb 5, 2016 (wiswedel): created
  */
-package org.knime.ext.tableau;
+package org.knime.ext.tableau.tde.write;
 
-import com.tableausoftware.TableauException;
-import com.tableausoftware.extract.ExtractAPI;
+import org.knime.core.node.NodeDialogPane;
+import org.knime.core.node.NodeFactory;
+import org.knime.core.node.NodeView;
+import org.knime.ext.tableau.extractwrite.TableauExtractNodeDialogPane;
+import org.knime.ext.tableau.extractwrite.TableauExtractNodeModel;
+import org.knime.ext.tableau.tde.TableauTDEExtractAPI;
+import org.knime.ext.tableau.tde.TableauTDEExtractWriter;
 
 /**
- *
  * @author Benjamin Wilhelm, KNIME GmbH, Konstanz, Germany
  */
-public class TableauTDEExtractAPI implements TableauExtractAPI {
+public final class TableauDENodeFactory extends NodeFactory<TableauExtractNodeModel> {
 
     @Override
-    public Class<?> getExtractAPIClass() {
-        return ExtractAPI.class;
+    public TableauExtractNodeModel createNodeModel() {
+        return new TableauExtractNodeModel(new TableauTDEExtractAPI(),
+            new TableauTDEExtractWriter.TableauTDEExtractCreator());
     }
 
     @Override
-    public void initialize() throws WrappingTableauException {
-        try {
-            ExtractAPI.initialize();
-        } catch (final TableauException e) {
-            throw new WrappingTableauException(e);
-        }
+    protected int getNrNodeViews() {
+        return 0;
     }
 
     @Override
-    public void cleanup() throws WrappingTableauException {
-        try {
-            ExtractAPI.cleanup();
-        } catch (final TableauException e) {
-            throw new WrappingTableauException(e);
-        }
+    public NodeView<TableauExtractNodeModel> createNodeView(final int viewIndex,
+        final TableauExtractNodeModel nodeModel) {
+        return null;
+    }
+
+    @Override
+    protected boolean hasDialog() {
+        return true;
+    }
+
+    @Override
+    protected NodeDialogPane createNodeDialogPane() {
+        return new TableauExtractNodeDialogPane("org.knime.ext.tableau.tdewrite", ".tde");
     }
 
 }

@@ -46,7 +46,7 @@
  * History
  *   Feb 5, 2016 (wiswedel): created
  */
-package org.knime.ext.tableau.sendtotableau;
+package org.knime.ext.tableau.tde.sendtotableau;
 
 import java.io.File;
 import java.io.IOException;
@@ -66,7 +66,7 @@ import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.util.CheckUtils;
 import org.knime.core.util.FileUtil;
 import org.knime.ext.tableau.TableauExtractWriter;
-import org.knime.ext.tableau.TableauTDEExtractWriter;
+import org.knime.ext.tableau.tde.TableauTDEExtractWriter;
 
 import com.tableausoftware.extract.ExtractAPI;
 import com.tableausoftware.server.ServerAPI;

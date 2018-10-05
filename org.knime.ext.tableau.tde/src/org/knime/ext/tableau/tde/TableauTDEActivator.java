@@ -46,7 +46,7 @@
  * History
  *   Mar 28, 2016 (wiswedel): created
  */
-package org.knime.ext.tableau;
+package org.knime.ext.tableau.tde;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -73,9 +73,9 @@ import com.sun.jna.NativeLibrary;
  * Activator for Tableau Plugin
  * @author wiswedel
  */
-public final class TableauActivator implements BundleActivator {
+public final class TableauTDEActivator implements BundleActivator {
 
-    private static final NodeLogger LOGGER = NodeLogger.getLogger(TableauActivator.class);
+    private static final NodeLogger LOGGER = NodeLogger.getLogger(TableauTDEActivator.class);
 
     @Override
     public void start(final BundleContext context) throws Exception {

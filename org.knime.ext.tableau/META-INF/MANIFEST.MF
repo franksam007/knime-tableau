@@ -3,17 +3,10 @@ Bundle-ManifestVersion: 2
 Bundle-Name: KNIME Tableau Integration
 Bundle-SymbolicName: org.knime.ext.tableau;singleton:=true
 Bundle-Version: 3.7.0.qualifier
-Bundle-ClassPath: .,
-  lib/jna.jar,
-  lib/tableaucommon.jar,
-  lib/tableauextract.jar,
-  lib/tableauserver.jar
-Bundle-Activator: org.knime.ext.tableau.TableauActivator
+Bundle-ClassPath: .
 Bundle-Vendor: KNIME AG, Zurich, Switzerland
 Export-Package: org.knime.ext.tableau,
- org.knime.ext.tableau.extractwrite,
- org.knime.ext.tableau.sendtotableau,
- org.knime.ext.tableau.tdewrite
+ org.knime.ext.tableau.extractwrite
 Require-Bundle: org.knime.core;bundle-version="[3.2.0,4.0.0)",
   org.knime.base;bundle-version="[3.2.0,4.0.0)",
   org.knime.workbench.repository;bundle-version="[3.2.0,4.0.0)",
