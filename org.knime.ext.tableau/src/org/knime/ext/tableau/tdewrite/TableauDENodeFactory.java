@@ -85,7 +85,7 @@ public final class TableauDENodeFactory extends NodeFactory<TableauExtractNodeMo
 
     @Override
     protected NodeDialogPane createNodeDialogPane() {
-        return new TableauExtractNodeDialogPane("org.knime.ext.tableau.tdewrite", ".tde", ".TDE");
+        return new TableauExtractNodeDialogPane("org.knime.ext.tableau.tdewrite", ".tde");
     }
 
 }
