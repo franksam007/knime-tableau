@@ -17,7 +17,7 @@
        	</intro>
        	<tab name="Main Configuration">
             <option name="Output Location">Choose the file to write to.</option>
-            <option name="Overwrite OK">If selected, the node will refuse to overwrite the file if it already exists (execution will fail)</option>
+            <option name="Overwrite OK">If not selected, the node will refuse to overwrite the file if it already exists (execution will fail)</option>
        	</tab>
         <!-- This is copied in the tableau server writer node. -->
        	<tab name="Installation">
