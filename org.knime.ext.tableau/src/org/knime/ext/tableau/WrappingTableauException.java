@@ -44,48 +44,25 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   Feb 5, 2016 (wiswedel): created
+ *   Oct 5, 2018 (bw): created
  */
-package org.knime.ext.tableau.tdewrite;
-
-import org.knime.core.node.NodeDialogPane;
-import org.knime.core.node.NodeFactory;
-import org.knime.core.node.NodeView;
-import org.knime.ext.tableau.TableauTDEExtractAPI;
-import org.knime.ext.tableau.TableauTDEExtractWriter;
-import org.knime.ext.tableau.extractwrite.TableauExtractNodeDialogPane;
-import org.knime.ext.tableau.extractwrite.TableauExtractNodeModel;
+package org.knime.ext.tableau;
 
 /**
- * @author Benjamin Wilhelm, KNIME GmbH, Konstanz, Germany
+ * Wraps a TableauException from the tableausdk or the Extract API
+ *
+ * @author Benjamin Wilhelm
  */
-public final class TableauDENodeFactory extends NodeFactory<TableauExtractNodeModel> {
+public class WrappingTableauException extends Exception {
 
-    @Override
-    public TableauExtractNodeModel createNodeModel() {
-        return new TableauExtractNodeModel(new TableauTDEExtractAPI(),
-            new TableauTDEExtractWriter.TableauTDEExtractCreator());
+    private static final long serialVersionUID = 1L;
+
+    /**
+     * Creates a new Exception wrapping the given tableau exception.
+     *
+     * @param tableauException
+     */
+    public WrappingTableauException(final Exception tableauException) {
+        super(tableauException.getMessage(), tableauException);
     }
-
-    @Override
-    protected int getNrNodeViews() {
-        return 0;
-    }
-
-    @Override
-    public NodeView<TableauExtractNodeModel> createNodeView(final int viewIndex,
-        final TableauExtractNodeModel nodeModel) {
-        return null;
-    }
-
-    @Override
-    protected boolean hasDialog() {
-        return true;
-    }
-
-    @Override
-    protected NodeDialogPane createNodeDialogPane() {
-        return new TableauExtractNodeDialogPane("org.knime.ext.tableau.tdewrite", ".tde", ".TDE");
-    }
-
 }

@@ -51,6 +51,10 @@ package org.knime.ext.tableau.hyperwrite;
 import org.knime.core.node.NodeDialogPane;
 import org.knime.core.node.NodeFactory;
 import org.knime.core.node.NodeView;
+import org.knime.ext.tableau.TableauHyperExtractAPI;
+import org.knime.ext.tableau.TableauHyperExtractWriter;
+import org.knime.ext.tableau.extractwrite.TableauExtractNodeDialogPane;
+import org.knime.ext.tableau.extractwrite.TableauExtractNodeModel;
 
 /**
  * Factory for the Tableau Hyper Writer node.
@@ -58,11 +62,12 @@ import org.knime.core.node.NodeView;
  * @author Bernd Wiswedel, KNIME AG, Zurich, Switzerland
  * @author Benjamin Wilhelm, KNIME GmbH, Konstanz, Germany
  */
-public final class TableauHyperWriterNodeFactory extends NodeFactory<TableauHyperWriterNodeModel> {
+public final class TableauHyperWriterNodeFactory extends NodeFactory<TableauExtractNodeModel> {
 
     @Override
-    public TableauHyperWriterNodeModel createNodeModel() {
-        return new TableauHyperWriterNodeModel();
+    public TableauExtractNodeModel createNodeModel() {
+        return new TableauExtractNodeModel(new TableauHyperExtractAPI(),
+            new TableauHyperExtractWriter.TableauTDEExtractCreator());
     }
 
     @Override
@@ -71,7 +76,8 @@ public final class TableauHyperWriterNodeFactory extends NodeFactory<TableauHype
     }
 
     @Override
-    public NodeView<TableauHyperWriterNodeModel> createNodeView(final int viewIndex, final TableauHyperWriterNodeModel nodeModel) {
+    public NodeView<TableauExtractNodeModel> createNodeView(final int viewIndex,
+        final TableauExtractNodeModel nodeModel) {
         return null;
     }
 
@@ -82,6 +88,6 @@ public final class TableauHyperWriterNodeFactory extends NodeFactory<TableauHype
 
     @Override
     protected NodeDialogPane createNodeDialogPane() {
-        return new TableauHyperWriterNodeDialogPane();
+        return new TableauExtractNodeDialogPane("org.knime.ext.tableau.hyperwrite", ".hyper");
     }
 }

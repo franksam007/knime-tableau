@@ -44,56 +44,40 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   Feb 5, 2016 (wiswedel): created
+ *   Oct 5, 2018 (bw): created
  */
-package org.knime.ext.tableau.tdewrite;
+package org.knime.ext.tableau;
 
-import org.knime.core.node.InvalidSettingsException;
-import org.knime.core.node.NodeSettingsRO;
-import org.knime.core.node.NodeSettingsWO;
+import com.tableausoftware.TableauException;
+import com.tableausoftware.hyperextract.ExtractAPI;
 
 /**
- * TDE Writer Settings Proxy.
- * @author Bernd Wiswedel, KNIME AG, Zurich, Switzerland
+ *
+ * @author Benjamin Wilhelm, KNIME GmbH, Konstanz, Germany
  */
-final class TableauDESettings {
+public class TableauHyperExtractAPI implements TableauExtractAPI {
 
-    static final String CFG_OUTPUT_LOCATION = "outputLocation";
-
-    private String m_outputLocation;
-    private boolean m_overwriteOK;
-
-    String getOutputLocation() {
-        return m_outputLocation;
+    @Override
+    public Class<?> getExtractAPIClass() {
+        return ExtractAPI.class;
     }
 
-    void setOutputLocation(final String outputLocation) {
-        m_outputLocation = outputLocation;
+    @Override
+    public void initialize() throws WrappingTableauException {
+        try {
+            ExtractAPI.initialize();
+        } catch (final TableauException e) {
+            throw new WrappingTableauException(e);
+        }
     }
 
-    boolean isOverwriteOK() {
-        return m_overwriteOK;
-    }
-
-    void setOverwriteOK(final boolean overwriteOK) {
-        m_overwriteOK = overwriteOK;
-    }
-
-    void saveSettings(final NodeSettingsWO settings) {
-        settings.addString(TableauDESettings.CFG_OUTPUT_LOCATION, m_outputLocation);
-        settings.addBoolean("overwriteOK", m_overwriteOK);
-    }
-
-    TableauDESettings loadSettingsInDialog(final NodeSettingsRO settings) {
-        m_outputLocation = settings.getString(TableauDESettings.CFG_OUTPUT_LOCATION, "");
-        m_overwriteOK = settings.getBoolean("overwriteOK", false);
-        return this;
-    }
-
-    TableauDESettings loadSettingsInModel(final NodeSettingsRO settings) throws InvalidSettingsException {
-        m_overwriteOK = settings.getBoolean("overwriteOK");
-        m_outputLocation = settings.getString(TableauDESettings.CFG_OUTPUT_LOCATION);
-        return this;
+    @Override
+    public void cleanup() throws WrappingTableauException {
+        try {
+            ExtractAPI.cleanup();
+        } catch (final TableauException e) {
+            throw new WrappingTableauException(e);
+        }
     }
 
 }

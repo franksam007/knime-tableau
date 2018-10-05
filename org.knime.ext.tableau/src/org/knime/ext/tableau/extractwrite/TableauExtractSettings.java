@@ -46,46 +46,54 @@
  * History
  *   Feb 5, 2016 (wiswedel): created
  */
-package org.knime.ext.tableau.tdewrite;
+package org.knime.ext.tableau.extractwrite;
 
-import org.knime.core.node.NodeDialogPane;
-import org.knime.core.node.NodeFactory;
-import org.knime.core.node.NodeView;
-import org.knime.ext.tableau.TableauTDEExtractAPI;
-import org.knime.ext.tableau.TableauTDEExtractWriter;
-import org.knime.ext.tableau.extractwrite.TableauExtractNodeDialogPane;
-import org.knime.ext.tableau.extractwrite.TableauExtractNodeModel;
+import org.knime.core.node.InvalidSettingsException;
+import org.knime.core.node.NodeSettingsRO;
+import org.knime.core.node.NodeSettingsWO;
 
 /**
- * @author Benjamin Wilhelm, KNIME GmbH, Konstanz, Germany
+ * TDE Writer Settings Proxy.
+ * @author Bernd Wiswedel, KNIME AG, Zurich, Switzerland
  */
-public final class TableauDENodeFactory extends NodeFactory<TableauExtractNodeModel> {
+final class TableauExtractSettings {
 
-    @Override
-    public TableauExtractNodeModel createNodeModel() {
-        return new TableauExtractNodeModel(new TableauTDEExtractAPI(),
-            new TableauTDEExtractWriter.TableauTDEExtractCreator());
+    static final String CFG_OUTPUT_LOCATION = "outputLocation";
+
+    private String m_outputLocation;
+    private boolean m_overwriteOK;
+
+    String getOutputLocation() {
+        return m_outputLocation;
     }
 
-    @Override
-    protected int getNrNodeViews() {
-        return 0;
+    void setOutputLocation(final String outputLocation) {
+        m_outputLocation = outputLocation;
     }
 
-    @Override
-    public NodeView<TableauExtractNodeModel> createNodeView(final int viewIndex,
-        final TableauExtractNodeModel nodeModel) {
-        return null;
+    boolean isOverwriteOK() {
+        return m_overwriteOK;
     }
 
-    @Override
-    protected boolean hasDialog() {
-        return true;
+    void setOverwriteOK(final boolean overwriteOK) {
+        m_overwriteOK = overwriteOK;
     }
 
-    @Override
-    protected NodeDialogPane createNodeDialogPane() {
-        return new TableauExtractNodeDialogPane("org.knime.ext.tableau.tdewrite", ".tde", ".TDE");
+    void saveSettings(final NodeSettingsWO settings) {
+        settings.addString(TableauExtractSettings.CFG_OUTPUT_LOCATION, m_outputLocation);
+        settings.addBoolean("overwriteOK", m_overwriteOK);
+    }
+
+    TableauExtractSettings loadSettingsInDialog(final NodeSettingsRO settings) {
+        m_outputLocation = settings.getString(TableauExtractSettings.CFG_OUTPUT_LOCATION, "");
+        m_overwriteOK = settings.getBoolean("overwriteOK", false);
+        return this;
+    }
+
+    TableauExtractSettings loadSettingsInModel(final NodeSettingsRO settings) throws InvalidSettingsException {
+        m_overwriteOK = settings.getBoolean("overwriteOK");
+        m_outputLocation = settings.getString(TableauExtractSettings.CFG_OUTPUT_LOCATION);
+        return this;
     }
 
 }

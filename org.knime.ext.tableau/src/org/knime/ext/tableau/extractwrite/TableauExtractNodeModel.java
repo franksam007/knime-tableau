@@ -46,7 +46,7 @@
  * History
  *   Feb 5, 2016 (wiswedel): created
  */
-package org.knime.ext.tableau.hyperwrite;
+package org.knime.ext.tableau.extractwrite;
 
 import java.io.File;
 import java.io.IOException;
@@ -58,30 +58,39 @@ import org.knime.core.node.CanceledExecutionException;
 import org.knime.core.node.ExecutionContext;
 import org.knime.core.node.ExecutionMonitor;
 import org.knime.core.node.InvalidSettingsException;
-import org.knime.core.node.NodeLogger;
 import org.knime.core.node.NodeModel;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.util.CheckUtils;
 import org.knime.core.util.FileUtil;
-import org.knime.ext.tableau.TableauHyperTableWriter;
-
-import com.tableausoftware.hyperextract.ExtractAPI;
+import org.knime.ext.tableau.TableauExtractAPI;
+import org.knime.ext.tableau.TableauExtractCreator;
+import org.knime.ext.tableau.TableauExtractWriter;
 
 /**
- * Model for Tableau Hyper Writer node.
+ * Model for Tableau Extract writer nodes.
  *
  * @author Bernd Wiswedel, KNIME AG, Zurich, Switzerland
  * @author Benjamin Wilhelm, KNIME GmbH, Konstanz, Germany
  */
-final class TableauHyperWriterNodeModel extends NodeModel {
+public final class TableauExtractNodeModel extends NodeModel {
 
-    private final static NodeLogger LOGGER = NodeLogger.getLogger(TableauHyperTableWriter.class);
+    private final TableauExtractAPI m_extractAPI;
 
-    private TableauHyperWriterSettings m_settings;
+    private final TableauExtractCreator m_extractCreator;
 
-    TableauHyperWriterNodeModel() {
+    private TableauExtractSettings m_settings;
+
+    /**
+     * Creates a new node model for writing tableau extracts.
+     *
+     * @param extractAPI the wrapper to the ExtractAPI to use
+     * @param extractCreator the tableau extract creator to use
+     */
+    public TableauExtractNodeModel(final TableauExtractAPI extractAPI, final TableauExtractCreator extractCreator) {
         super(1, 0);
+        m_extractAPI = extractAPI;
+        m_extractCreator = extractCreator;
     }
 
     @Override
@@ -94,6 +103,7 @@ final class TableauHyperWriterNodeModel extends NodeModel {
     @Override
     protected BufferedDataTable[] execute(final BufferedDataTable[] inData, final ExecutionContext exec)
         throws Exception {
+        final TableauExtractSettings s = m_settings;
         final BufferedDataTable table = inData[0];
         long rowIndex = 0L;
         final long rowCount = table.size();
@@ -107,21 +117,22 @@ final class TableauHyperWriterNodeModel extends NodeModel {
                         f.getAbsolutePath()));
             }
         }
-        synchronized (ExtractAPI.class) {
-            ExtractAPI.initialize();
-            try (TableauHyperTableWriter tableWriter =
-                TableauHyperTableWriter.create(m_settings.getOutputLocation(), table.getDataTableSpec())) {
+        synchronized (m_extractAPI.getClass()) {
+            m_extractAPI.initialize();
+            try (final TableauExtractWriter tableWriter =
+                m_extractCreator.createExtract(s.getOutputLocation(), table.getDataTableSpec())) {
                 // This part works ok
-                for (DataRow r : table) {
+                for (final DataRow r : table) {
                     tableWriter.addRow(r);
                     exec.setProgress((double)++rowIndex / rowCount,
                         String.format("Row %d/%d (\"%s\")", rowIndex, rowCount, r.getKey().toString()));
                 }
-            } catch (UnsatisfiedLinkError e) {
+            } catch (final UnsatisfiedLinkError e) {
+                // TODO move somewhere else?
                 throw new Exception(e.getMessage() + " (follow \"Installation\" steps described in node description)",
                     e);
             } finally {
-                ExtractAPI.cleanup();
+                m_extractAPI.cleanup();
             }
         }
         return new BufferedDataTable[]{};
@@ -133,12 +144,12 @@ final class TableauHyperWriterNodeModel extends NodeModel {
 
     @Override
     protected void validateSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
-        new TableauHyperWriterSettings().loadSettingsInModel(settings);
+        new TableauExtractSettings().loadSettingsInModel(settings);
     }
 
     @Override
     protected void loadValidatedSettingsFrom(final NodeSettingsRO settings) throws InvalidSettingsException {
-        m_settings = new TableauHyperWriterSettings().loadSettingsInModel(settings);
+        m_settings = new TableauExtractSettings().loadSettingsInModel(settings);
     }
 
     @Override
@@ -157,5 +168,4 @@ final class TableauHyperWriterNodeModel extends NodeModel {
     protected void saveInternals(final File nodeInternDir, final ExecutionMonitor exec)
         throws IOException, CanceledExecutionException {
     }
-
 }

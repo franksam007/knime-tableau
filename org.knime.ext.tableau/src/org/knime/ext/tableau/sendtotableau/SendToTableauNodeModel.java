@@ -65,7 +65,8 @@ import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.util.CheckUtils;
 import org.knime.core.util.FileUtil;
-import org.knime.ext.tableau.TableauTableWriter;
+import org.knime.ext.tableau.TableauExtractWriter;
+import org.knime.ext.tableau.TableauTDEExtractWriter;
 
 import com.tableausoftware.extract.ExtractAPI;
 import com.tableausoftware.server.ServerAPI;
@@ -92,8 +93,8 @@ final class SendToTableauNodeModel extends NodeModel {
 
     /** {@inheritDoc} */
     @Override
-    protected BufferedDataTable[] execute(final BufferedDataTable[] inData,
-        final ExecutionContext exec) throws Exception {
+    protected BufferedDataTable[] execute(final BufferedDataTable[] inData, final ExecutionContext exec)
+        throws Exception {
         SendToTableauSettings s = m_settings;
         BufferedDataTable table = inData[0];
         long rowIndex = 0L;
@@ -103,13 +104,13 @@ final class SendToTableauNodeModel extends NodeModel {
         try {
             getLogger().debugWithFormat("Will write temporary tableau file to \"%s\"", t.getAbsolutePath());
             ExtractAPI.initialize();
-            try (TableauTableWriter tableWriter = TableauTableWriter.create(t.getAbsolutePath(),
-                table.getDataTableSpec())) {
+            try (TableauExtractWriter tableWriter = new TableauTDEExtractWriter.TableauTDEExtractCreator()
+                .createExtract(t.getAbsolutePath(), table.getDataTableSpec())) {
                 // This part works ok
                 for (DataRow r : table) {
                     tableWriter.addRow(r);
-                    exec.setProgress((double)++rowIndex / rowCount, String.format("Row %d/%d (\"%s\")",
-                        rowIndex, rowCount, r.getKey().toString()));
+                    exec.setProgress((double)++rowIndex / rowCount,
+                        String.format("Row %d/%d (\"%s\")", rowIndex, rowCount, r.getKey().toString()));
                 }
                 getLogger().debugWithFormat("Successfully written temporary tableau file (\"%s\" - %s)",
                     t.getAbsolutePath(), FileUtils.byteCountToDisplaySize(FileUtils.sizeOf(t)));
@@ -124,8 +125,8 @@ final class SendToTableauNodeModel extends NodeModel {
                 if (StringUtils.isNotEmpty(s.getProxyUsername())) {
                     serverConnection.setProxyCredentials(s.getProxyUsername(), s.getProxyPassword());
                 }
-                serverConnection.publishExtract(t.getAbsolutePath(), s.getProjectName(),
-                    s.getDatasourceName(), s.isOverwrite());
+                serverConnection.publishExtract(t.getAbsolutePath(), s.getProjectName(), s.getDatasourceName(),
+                    s.isOverwrite());
             } finally {
                 if (serverConnection != null) {
                     serverConnection.disconnect();
@@ -136,7 +137,7 @@ final class SendToTableauNodeModel extends NodeModel {
         } finally {
             t.delete();
         }
-        return new BufferedDataTable[] {};
+        return new BufferedDataTable[]{};
     }
 
     /** {@inheritDoc} */

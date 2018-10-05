@@ -44,58 +44,34 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   Feb 5, 2016 (wiswedel): created
+ *   Oct 5, 2018 (bw): created
  */
-package org.knime.ext.tableau.hyperwrite;
-
-import org.knime.core.node.InvalidSettingsException;
-import org.knime.core.node.NodeSettingsRO;
-import org.knime.core.node.NodeSettingsWO;
+package org.knime.ext.tableau;
 
 /**
- * Tableau Hyper Writer Settings Proxy.
+ * Wrapper for the Tableau ExtractAPI class.
  *
- * @author Bernd Wiswedel, KNIME AG, Zurich, Switzerland
  * @author Benjamin Wilhelm, KNIME GmbH, Konstanz, Germany
  */
-final class TableauHyperWriterSettings {
+public interface TableauExtractAPI {
 
-    static final String CFG_OUTPUT_LOCATION = "outputLocation";
+    /**
+     * @return the used ExtractAPI class
+     */
+    Class<?> getExtractAPIClass();
 
-    private String m_outputLocation;
-    private boolean m_overwriteOK;
+    /**
+     * Calls <code>initialize</code> on Tableau ExtractAPI class.
+     *
+     * @throws WrappingTableauException if the initialize method throws a TableauException (not documented on Tableau
+     *             side)
+     */
+    void initialize() throws WrappingTableauException;
 
-    String getOutputLocation() {
-        return m_outputLocation;
-    }
-
-    void setOutputLocation(final String outputLocation) {
-        m_outputLocation = outputLocation;
-    }
-
-    boolean isOverwriteOK() {
-        return m_overwriteOK;
-    }
-
-    void setOverwriteOK(final boolean overwriteOK) {
-        m_overwriteOK = overwriteOK;
-    }
-
-    void saveSettings(final NodeSettingsWO settings) {
-        settings.addString(TableauHyperWriterSettings.CFG_OUTPUT_LOCATION, m_outputLocation);
-        settings.addBoolean("overwriteOK", m_overwriteOK);
-    }
-
-    TableauHyperWriterSettings loadSettingsInDialog(final NodeSettingsRO settings) {
-        m_outputLocation = settings.getString(TableauHyperWriterSettings.CFG_OUTPUT_LOCATION, "");
-        m_overwriteOK = settings.getBoolean("overwriteOK", false);
-        return this;
-    }
-
-    TableauHyperWriterSettings loadSettingsInModel(final NodeSettingsRO settings) throws InvalidSettingsException {
-        m_overwriteOK = settings.getBoolean("overwriteOK");
-        m_outputLocation = settings.getString(TableauHyperWriterSettings.CFG_OUTPUT_LOCATION);
-        return this;
-    }
-
+    /**
+     * Calls <code>cleanup</code> on Tableau ExtractAPI class.
+     *
+     * @throws WrappingTableauException if the cleanup method throws a TableauException (not documented on Tableau side)
+     */
+    void cleanup() throws WrappingTableauException;
 }

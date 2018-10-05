@@ -44,48 +44,40 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   Feb 5, 2016 (wiswedel): created
+ *   Oct 5, 2018 (bw): created
  */
-package org.knime.ext.tableau.tdewrite;
+package org.knime.ext.tableau;
 
-import org.knime.core.node.NodeDialogPane;
-import org.knime.core.node.NodeFactory;
-import org.knime.core.node.NodeView;
-import org.knime.ext.tableau.TableauTDEExtractAPI;
-import org.knime.ext.tableau.TableauTDEExtractWriter;
-import org.knime.ext.tableau.extractwrite.TableauExtractNodeDialogPane;
-import org.knime.ext.tableau.extractwrite.TableauExtractNodeModel;
+import com.tableausoftware.TableauException;
+import com.tableausoftware.extract.ExtractAPI;
 
 /**
+ *
  * @author Benjamin Wilhelm, KNIME GmbH, Konstanz, Germany
  */
-public final class TableauDENodeFactory extends NodeFactory<TableauExtractNodeModel> {
+public class TableauTDEExtractAPI implements TableauExtractAPI {
 
     @Override
-    public TableauExtractNodeModel createNodeModel() {
-        return new TableauExtractNodeModel(new TableauTDEExtractAPI(),
-            new TableauTDEExtractWriter.TableauTDEExtractCreator());
+    public Class<?> getExtractAPIClass() {
+        return ExtractAPI.class;
     }
 
     @Override
-    protected int getNrNodeViews() {
-        return 0;
+    public void initialize() throws WrappingTableauException {
+        try {
+            ExtractAPI.initialize();
+        } catch (final TableauException e) {
+            throw new WrappingTableauException(e);
+        }
     }
 
     @Override
-    public NodeView<TableauExtractNodeModel> createNodeView(final int viewIndex,
-        final TableauExtractNodeModel nodeModel) {
-        return null;
-    }
-
-    @Override
-    protected boolean hasDialog() {
-        return true;
-    }
-
-    @Override
-    protected NodeDialogPane createNodeDialogPane() {
-        return new TableauExtractNodeDialogPane("org.knime.ext.tableau.tdewrite", ".tde", ".TDE");
+    public void cleanup() throws WrappingTableauException {
+        try {
+            ExtractAPI.cleanup();
+        } catch (final TableauException e) {
+            throw new WrappingTableauException(e);
+        }
     }
 
 }

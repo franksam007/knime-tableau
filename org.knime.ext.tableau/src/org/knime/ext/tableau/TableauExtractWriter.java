@@ -46,46 +46,21 @@
  * History
  *   Feb 5, 2016 (wiswedel): created
  */
-package org.knime.ext.tableau.tdewrite;
+package org.knime.ext.tableau;
 
-import org.knime.core.node.NodeDialogPane;
-import org.knime.core.node.NodeFactory;
-import org.knime.core.node.NodeView;
-import org.knime.ext.tableau.TableauTDEExtractAPI;
-import org.knime.ext.tableau.TableauTDEExtractWriter;
-import org.knime.ext.tableau.extractwrite.TableauExtractNodeDialogPane;
-import org.knime.ext.tableau.extractwrite.TableauExtractNodeModel;
+import org.knime.core.data.DataRow;
 
 /**
+ *
  * @author Benjamin Wilhelm, KNIME GmbH, Konstanz, Germany
  */
-public final class TableauDENodeFactory extends NodeFactory<TableauExtractNodeModel> {
+public interface TableauExtractWriter extends AutoCloseable {
 
-    @Override
-    public TableauExtractNodeModel createNodeModel() {
-        return new TableauExtractNodeModel(new TableauTDEExtractAPI(),
-            new TableauTDEExtractWriter.TableauTDEExtractCreator());
-    }
-
-    @Override
-    protected int getNrNodeViews() {
-        return 0;
-    }
-
-    @Override
-    public NodeView<TableauExtractNodeModel> createNodeView(final int viewIndex,
-        final TableauExtractNodeModel nodeModel) {
-        return null;
-    }
-
-    @Override
-    protected boolean hasDialog() {
-        return true;
-    }
-
-    @Override
-    protected NodeDialogPane createNodeDialogPane() {
-        return new TableauExtractNodeDialogPane("org.knime.ext.tableau.tdewrite", ".tde", ".TDE");
-    }
-
+    /**
+     * Adds a row to the extract.
+     *
+     * @param dataRow the row
+     * @throws WrappingTableauException if the Tableau API throws a TableauException (not documented on Tableau side)
+     */
+    void addRow(DataRow dataRow) throws WrappingTableauException;
 }

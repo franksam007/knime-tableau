@@ -46,7 +46,7 @@
  * History
  *   Feb 5, 2016 (wiswedel): created
  */
-package org.knime.ext.tableau.tdewrite;
+package org.knime.ext.tableau.extractwrite;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -67,24 +67,32 @@ import org.knime.core.node.workflow.FlowVariable.Type;
 
 /**
  * Dialog for TDE Writer
+ *
  * @author Bernd Wiswedel, KNIME AG, Zurich, Switzerland
+ * @author Benjamin Wilhelm, KNIME GmbH, Konstanz, Germany
  */
-final class TableauDEWriteNodeDialogPane extends NodeDialogPane {
+public final class TableauExtractNodeDialogPane extends NodeDialogPane {
 
     private final FilesHistoryPanel m_filePanel;
+
     private final JCheckBox m_overwriteChecker;
 
-    TableauDEWriteNodeDialogPane() {
-        m_filePanel = new FilesHistoryPanel(createFlowVariableModel(TableauDESettings.CFG_OUTPUT_LOCATION, Type.STRING),
-                    "org.knime.ext.tableau.tdewrite", LocationValidation.FileOutput, ".tde", ".TDE");
-        m_filePanel.setDialogTypeSaveWithExtension(".tde");
+    /**
+     * Creates a new Dialog for a Tableau extract writer.
+     *
+     * @param historyId the file panel history id
+     * @param fileExtensions the allowed file extensions for the extract file
+     */
+    public TableauExtractNodeDialogPane(final String historyId, final String... fileExtensions) {
+        // TODO force extension -> do not close with wrong extension
+        m_filePanel =
+            new FilesHistoryPanel(createFlowVariableModel(TableauExtractSettings.CFG_OUTPUT_LOCATION, Type.STRING),
+                historyId, LocationValidation.FileOutput, fileExtensions);
+        m_filePanel.setDialogTypeSaveWithExtension(fileExtensions[0]);
         m_overwriteChecker = new JCheckBox("Overwrite OK");
-        addTab("TDE Settings", initPanel());
+        addTab("Extract Settings", initPanel());
     }
 
-    /**
-     * @return
-     */
     private JPanel initPanel() {
         JPanel p = new JPanel(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
@@ -117,22 +125,19 @@ final class TableauDEWriteNodeDialogPane extends NodeDialogPane {
         return gbc;
     }
 
-    /** {@inheritDoc} */
     @Override
     protected void loadSettingsFrom(final NodeSettingsRO settings, final DataTableSpec[] specs) {
-        TableauDESettings s = new TableauDESettings().loadSettingsInDialog(settings);
+        final TableauExtractSettings s = new TableauExtractSettings().loadSettingsInDialog(settings);
         m_filePanel.updateHistory();
         m_filePanel.setSelectedFile(s.getOutputLocation());
         m_overwriteChecker.setSelected(s.isOverwriteOK());
     }
 
-    /** {@inheritDoc} */
     @Override
     protected void saveSettingsTo(final NodeSettingsWO settings) throws InvalidSettingsException {
-        TableauDESettings s = new TableauDESettings();
+        final TableauExtractSettings s = new TableauExtractSettings();
         s.setOutputLocation(m_filePanel.getSelectedFile());
         s.setOverwriteOK(m_overwriteChecker.isSelected());
-
         s.saveSettings(settings);
     }
 
