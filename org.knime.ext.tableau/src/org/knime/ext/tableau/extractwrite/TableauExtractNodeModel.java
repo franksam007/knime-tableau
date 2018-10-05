@@ -103,7 +103,6 @@ public final class TableauExtractNodeModel extends NodeModel {
     @Override
     protected BufferedDataTable[] execute(final BufferedDataTable[] inData, final ExecutionContext exec)
         throws Exception {
-        final TableauExtractSettings s = m_settings;
         final BufferedDataTable table = inData[0];
         long rowIndex = 0L;
         final long rowCount = table.size();
@@ -120,7 +119,7 @@ public final class TableauExtractNodeModel extends NodeModel {
         synchronized (m_extractAPI.getClass()) {
             m_extractAPI.initialize();
             try (final TableauExtractWriter tableWriter =
-                m_extractCreator.createExtract(s.getOutputLocation(), table.getDataTableSpec())) {
+                m_extractCreator.createExtract(f.getAbsolutePath(), table.getDataTableSpec())) {
                 // This part works ok
                 for (final DataRow r : table) {
                     tableWriter.addRow(r);
