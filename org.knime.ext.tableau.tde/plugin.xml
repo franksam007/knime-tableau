@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <?eclipse version="3.2"?><plugin>
 
-   <extension-point id="org.knime.ext.tableau" name="tableauLibFolder" schema="schema/org.knime.ext.tableau.exsd"/>
+   <extension-point id="org.knime.ext.tableau.tde" name="tableauLibFolder" schema="schema/org.knime.ext.tableau.tde.exsd"/>
 
    <extension point="org.knime.workbench.repository.nodes">
       <node

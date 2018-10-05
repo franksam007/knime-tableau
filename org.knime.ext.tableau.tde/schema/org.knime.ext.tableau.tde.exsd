@@ -1,9 +1,9 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <!-- Schema file written by PDE -->
-<schema targetNamespace="org.knime.ext.tableau" xmlns="http://www.w3.org/2001/XMLSchema">
+<schema targetNamespace="org.knime.ext.tableau.tde" xmlns="http://www.w3.org/2001/XMLSchema">
 <annotation>
       <appInfo>
-         <meta.schema plugin="org.knime.ext.tableau" id="org.knime.ext.tableau" name="tableauLibFolder"/>
+         <meta.schema plugin="org.knime.ext.tableau.tde" id="org.knime.ext.tableau.tde" name="tableauLibFolder"/>
       </appInfo>
       <documentation>
          Defines path of tableau library -- OS dependent. Not meant for public use.

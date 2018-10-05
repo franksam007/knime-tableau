@@ -80,7 +80,7 @@ public final class TableauTDEActivator implements BundleActivator {
     @Override
     public void start(final BundleContext context) throws Exception {
         IExtensionRegistry registry = Platform.getExtensionRegistry();
-        IExtensionPoint point = registry.getExtensionPoint("org.knime.ext.tableau");
+        IExtensionPoint point = registry.getExtensionPoint("org.knime.ext.tableau.tde");
         boolean hasAtLeastOneContribution = false;
 
         for (Iterator<IConfigurationElement> it = Stream.of(point.getExtensions()).flatMap(

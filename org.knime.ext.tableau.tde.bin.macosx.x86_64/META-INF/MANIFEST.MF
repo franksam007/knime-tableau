@@ -1,10 +1,10 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Tableau binaries for 64bit MacOSX
-Bundle-SymbolicName: org.knime.ext.tableau.bin.macosx.x86_64;singleton:=true
+Bundle-SymbolicName: org.knime.ext.tableau.tde.bin.macosx.x86_64;singleton:=true
 Bundle-Version: 9.3.1.qualifier
 Eclipse-PlatformFilter: (&(osgi.os=macosx)(osgi.arch=x86_64))
 Bundle-Vendor: KNIME AG, Zurich, Switzerland
-Require-Bundle: org.knime.ext.tableau;bundle-version="[3.2.0,4.0.0)"
+Require-Bundle: org.knime.ext.tableau.tde;bundle-version="[3.7.0,4.0.0)"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ActivationPolicy: lazy

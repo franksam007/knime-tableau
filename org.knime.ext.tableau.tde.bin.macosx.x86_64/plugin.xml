@@ -1,21 +1,21 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <?eclipse version="3.2"?>
 <plugin>
-   <extension point="org.knime.ext.tableau">
+   <extension point="org.knime.ext.tableau.tde">
       <libFolder
             name="TableauExtract"
             path="Tableau-SDK-9-3-1/Frameworks/TableauExtract.framework/">
       </libFolder>
    </extension>
    <extension
-         point="org.knime.ext.tableau">
+         point="org.knime.ext.tableau.tde">
       <libFolder
             name="TableauServer"
             path="Tableau-SDK-9-3-1/Frameworks/TableauServer.framework/">
       </libFolder>
    </extension>
    <extension
-         point="org.knime.ext.tableau">
+         point="org.knime.ext.tableau.tde">
       <libFolder
             name="TableauCommon"
             path="Tableau-SDK-9-3-1/Frameworks/TableauCommon.framework/">
