@@ -48,9 +48,25 @@
  */
 package org.knime.ext.tableau.hyper;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.file.Paths;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.stream.Stream;
+
+import org.apache.commons.lang3.StringUtils;
+import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.IConfigurationElement;
+import org.eclipse.core.runtime.IExtensionPoint;
+import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Platform;
 import org.knime.core.node.NodeLogger;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
+
+import com.sun.jna.NativeLibrary;
 
 /**
  * Activator for Tableau binary Plugin
@@ -61,17 +77,54 @@ public final class TableauHyperActivator implements BundleActivator {
 
     private static final NodeLogger LOGGER = NodeLogger.getLogger(TableauHyperActivator.class);
 
+    private static final String EXTENSION_POINT_ID = "org.knime.ext.tableau.hyper";
+
     @Override
     public void start(final BundleContext context) throws Exception {
-        // TODO set the library path
-        // Option 1:
-        // - Like in org.knime.ext.tableau.TableauActivator
-        // Option 2:
-        // - Set jna.path.library variable
+        final IExtensionPoint point = Platform.getExtensionRegistry().getExtensionPoint(EXTENSION_POINT_ID);
+        boolean hasAtLeastOneContribution = false;
+
+        for (final Iterator<IConfigurationElement> it = Stream.of(point.getExtensions()).flatMap(
+            ext -> Stream.of(ext.getConfigurationElements())).iterator(); it.hasNext(); ) {
+            final IConfigurationElement element = it.next();
+            final String pluginID = element.getContributor().getName();
+            final String libName = element.getAttribute("name");
+            if (StringUtils.isEmpty(libName)) {
+                LOGGER.errorWithFormat("Tableau library name cannot be empty in plug-in %s.", pluginID);
+                continue;
+            }
+            final String pathString = element.getAttribute("path");
+            final Path path = new Path(pathString);
+            URL url = FileLocator.find(Platform.getBundle(pluginID), path, Collections.emptyMap());
+            url = url == null ? null : FileLocator.resolve(url);
+            if (url == null) {
+                LOGGER.errorWithFormat("Cannot resolve tableau library resource for plug-in %s, path \"%s\"",
+                    pluginID, pathString);
+            } else if (!"file".equals(url.getProtocol())) {
+                LOGGER.errorWithFormat("Could not resolve URL \"%s\" relative to bundle \"%s\" as a local file "
+                        + "(original path \"%s\")", url.toString(), pluginID, pathString);
+            } else {
+                try {
+                    // must not use url.toURI() -- FileLocator leaves spaces in the URL (see eclipse bug 145096)
+                    java.nio.file.Path folderPath= Paths.get(new URI(url.getProtocol(), url.getFile(), null));
+                    folderPath = folderPath.normalize();
+                    LOGGER.debugWithFormat("Added tableau library path: \"%s\"", folderPath);
+                    NativeLibrary.addSearchPath(libName, folderPath.toString());
+                    hasAtLeastOneContribution = true;
+                } catch (URISyntaxException use) {
+                    LOGGER.error(String.format("Unable to resolve file from URL \"%s\": %s",
+                        url, use.getMessage(), use));
+                }
+            }
+        }
+        if (!hasAtLeastOneContribution) {
+            LOGGER.debug("No tableau binary fragments installed -- relying on system's library path");
+        }
     }
 
     @Override
     public void stop(final BundleContext context) throws Exception {
+        // nothing to do
     }
 
 }
