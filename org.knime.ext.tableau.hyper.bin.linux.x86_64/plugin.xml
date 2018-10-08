@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?eclipse version="3.2"?>
+<plugin>
+    <extension point="org.knime.ext.tableau.hyper">
+        <libFolder name="TableauHyperExtract" path="extractapi-linux-x86_64-2018-2-2/lib64/tableausdk/" />
+    </extension>
+    <extension point="org.knime.ext.tableau.hyper">
+        <libFolder name="TableauCommon" path="extractapi-linux-x86_64-2018-2-2/lib64/tableausdk/" />
+    </extension>
+</plugin>

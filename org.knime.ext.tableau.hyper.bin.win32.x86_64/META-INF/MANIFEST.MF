@@ -1,0 +1,10 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Tableau Extract API 2.0 binaries for 64bit Windows
+Bundle-SymbolicName: org.knime.ext.tableau.hyper.bin.win32.x86_64;singleton:=true
+Bundle-Version: 2018.2.2.qualifier
+Eclipse-PlatformFilter: (&(osgi.os=win32)(osgi.arch=x86_64))
+Bundle-Vendor: KNIME AG, Zurich, Switzerland
+Require-Bundle: org.knime.ext.tableau.hyper;bundle-version="[3.7.0,4.0.0)"
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Bundle-ActivationPolicy: lazy
