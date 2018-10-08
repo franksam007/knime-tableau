@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
       id="org.knime.features.ext.tableau.bin"
-      label="KNIME Tableau SDK (Linux/Mac) - Experimental"
+      label="KNIME Tableau SDK (Linux/Mac) - TDE Format - Experimental"
       version="3.7.0.qualifier"
       provider-name="KNIME AG, Zurich, Switzerland">
 
@@ -730,7 +730,7 @@ propagated with or for interoperation with KNIME.
    </license>
 
    <plugin
-         id="org.knime.ext.tableau.bin.linux.x86_64"
+         id="org.knime.ext.tableau.tde.bin.linux.x86_64"
          os="linux"
          arch="x86_64"
          download-size="0"
@@ -738,7 +738,7 @@ propagated with or for interoperation with KNIME.
          version="0.0.0"/>
 
    <plugin
-         id="org.knime.ext.tableau.bin.macosx.x86_64"
+         id="org.knime.ext.tableau.tde.bin.macosx.x86_64"
          os="macosx"
          arch="x86_64"
          download-size="0"
@@ -746,7 +746,7 @@ propagated with or for interoperation with KNIME.
          version="0.0.0"/>
 
    <plugin
-         id="org.knime.ext.tableau.bin.win32.x86_64"
+         id="org.knime.ext.tableau.tde.bin.win32.x86_64"
          os="win32"
          arch="x86_64"
          download-size="0"

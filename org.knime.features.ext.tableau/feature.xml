@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
       id="org.knime.features.ext.tableau"
-      label="KNIME Tableau integration"
+      label="KNIME Tableau Integration - TDE Format"
       version="3.7.0.qualifier"
       provider-name="KNIME AG, Zurich, Switzerland"
-      plugin="org.knime.ext.tableau">
+      plugin="org.knime.ext.tableau.tde">
 
    <description>
       KNIME extension offering Tableau integration.
@@ -727,6 +727,13 @@ interoperation with KNIME.  The owner of a Node may freely choose the
 license terms applicable to such Node, including when such Node is
 propagated with or for interoperation with KNIME.
    </license>
+
+   <plugin
+         id="org.knime.ext.tableau.tde"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
 
    <plugin
          id="org.knime.ext.tableau"
