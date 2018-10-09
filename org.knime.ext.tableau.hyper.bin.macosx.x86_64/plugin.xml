@@ -2,9 +2,9 @@
 <?eclipse version="3.2"?>
 <plugin>
     <extension point="org.knime.ext.tableau.hyper">
-        <libFolder name="TableauHyperExtract" path="extractapi-macosx-x86_64-2018-2-2/Frameworks/TableauHyperExtract.framework" />
+        <libFolder name="TableauHyperExtract" path="extractapi-macosx-x86_64-2018-2-2/Frameworks/TableauHyperExtract.framework/" />
     </extension>
     <extension point="org.knime.ext.tableau.hyper">
-        <libFolder name="TableauCommon" path="extractapi-macosx-x86_64-2018-2-2/Frameworks/TableauCommon.framework" />
+        <libFolder name="TableauCommon" path="extractapi-macosx-x86_64-2018-2-2/Frameworks/TableauCommon.framework/" />
     </extension>
 </plugin>
