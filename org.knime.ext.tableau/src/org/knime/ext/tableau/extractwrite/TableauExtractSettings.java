@@ -54,14 +54,33 @@ import org.knime.core.node.NodeSettingsWO;
 
 /**
  * TDE Writer Settings Proxy.
+ *
  * @author Bernd Wiswedel, KNIME AG, Zurich, Switzerland
+ * @author Benjamin Wilhelm, KNIME GmbH, Konstanz, Germany
  */
 final class TableauExtractSettings {
 
     static final String CFG_OUTPUT_LOCATION = "outputLocation";
 
+    static final String CFG_OVERWRITE_OK = "overwriteOK";
+
+    static final String CFG_OVERWRITE_POLICY = "overwritePolicy";
+
     private String m_outputLocation;
-    private boolean m_overwriteOK;
+
+    private FileOverwritePolicy m_fileOverwritePolicy;
+
+    /**
+     * Policy how to proceed when output file exists (overwrite, abort, append).
+     */
+    enum FileOverwritePolicy {
+            /** Fail during configure/execute. */
+            Abort,
+            /** Overwrite existing file. */
+            Overwrite,
+            /** Append to existing file. */
+            Append
+    }
 
     String getOutputLocation() {
         return m_outputLocation;
@@ -71,29 +90,42 @@ final class TableauExtractSettings {
         m_outputLocation = outputLocation;
     }
 
-    boolean isOverwriteOK() {
-        return m_overwriteOK;
+    FileOverwritePolicy getFileOverwritePolicy() {
+        return m_fileOverwritePolicy;
     }
 
-    void setOverwriteOK(final boolean overwriteOK) {
-        m_overwriteOK = overwriteOK;
+    void setFileOverwritePolicy(final FileOverwritePolicy fileOverwritePolicy) {
+        if (fileOverwritePolicy == null) {
+            m_fileOverwritePolicy = FileOverwritePolicy.Abort;
+        } else {
+            m_fileOverwritePolicy = fileOverwritePolicy;
+        }
     }
 
     void saveSettings(final NodeSettingsWO settings) {
-        settings.addString(TableauExtractSettings.CFG_OUTPUT_LOCATION, m_outputLocation);
-        settings.addBoolean("overwriteOK", m_overwriteOK);
+        settings.addString(CFG_OUTPUT_LOCATION, m_outputLocation);
+        settings.addString(CFG_OVERWRITE_POLICY, m_fileOverwritePolicy.toString());
     }
 
-    TableauExtractSettings loadSettingsInDialog(final NodeSettingsRO settings) {
-        m_outputLocation = settings.getString(TableauExtractSettings.CFG_OUTPUT_LOCATION, "");
-        m_overwriteOK = settings.getBoolean("overwriteOK", false);
+    TableauExtractSettings loadSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
+        m_outputLocation = settings.getString(CFG_OUTPUT_LOCATION, "");
+        if (settings.containsKey(CFG_OVERWRITE_POLICY)) { // since v3.7
+            final String val = settings.getString(CFG_OVERWRITE_POLICY, FileOverwritePolicy.Abort.toString());
+            try {
+                m_fileOverwritePolicy = FileOverwritePolicy.valueOf(val);
+            } catch (final Exception e) {
+                throw new InvalidSettingsException("Unable to parse 'file " + "overwrite policy' field: " + val, e);
+            }
+        } else if (settings.containsKey(CFG_OVERWRITE_OK)) { // before v3.7
+            if (settings.getBoolean(CFG_OVERWRITE_OK, false)) {
+                m_fileOverwritePolicy = FileOverwritePolicy.Overwrite;
+            } else {
+                m_fileOverwritePolicy = FileOverwritePolicy.Abort;
+            }
+        } else {
+            // Default value
+            m_fileOverwritePolicy = FileOverwritePolicy.Abort;
+        }
         return this;
     }
-
-    TableauExtractSettings loadSettingsInModel(final NodeSettingsRO settings) throws InvalidSettingsException {
-        m_overwriteOK = settings.getBoolean("overwriteOK");
-        m_outputLocation = settings.getString(TableauExtractSettings.CFG_OUTPUT_LOCATION);
-        return this;
-    }
-
 }

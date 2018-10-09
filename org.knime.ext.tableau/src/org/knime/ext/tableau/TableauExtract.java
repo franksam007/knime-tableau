@@ -56,9 +56,32 @@ import org.knime.core.data.DataTableSpec;
  */
 public interface TableauExtract extends AutoCloseable {
 
+    /**
+     * Creates a new table in the extract with the given name.
+     *
+     * @param name the name of the table
+     * @param spec the spec of the table
+     * @return a new TableauTable which can be used to write KNIME rows to the extract
+     * @throws WrappingTableauException if the Tableau API throws a TableauException (not documented on Tableau side)
+     */
     TableauTable createTable(String name, DataTableSpec spec) throws WrappingTableauException;
 
-    TableauTable openTable(String name) throws WrappingTableauException;
+    /**
+     * Opens the table in the extract with the given name and checks if its definition fits the given spec.
+     *
+     * @param name the name of the table
+     * @param spec the expected spec of the table
+     * @return a TableauTable which can be used to write KNIME rows to the extract
+     * @throws WrappingTableauException if the Tableau API throws a TableauException (not documented on Tableau side)
+     */
+    TableauTable openTable(String name, DataTableSpec spec) throws WrappingTableauException;
 
-    // TODO
+    /**
+     * Checks if the extract contains a table with the given name;
+     *
+     * @param name the name of the table
+     * @return true if the extract contains a table with this name
+     * @throws WrappingTableauException if the Tableau API throws a TableauException (not documented on Tableau side)
+     */
+    boolean hasTable(String name) throws WrappingTableauException;
 }

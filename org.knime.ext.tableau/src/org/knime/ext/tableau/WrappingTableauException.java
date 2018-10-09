@@ -65,4 +65,13 @@ public class WrappingTableauException extends Exception {
     public WrappingTableauException(final Exception tableauException) {
         super(tableauException.getMessage(), tableauException);
     }
+
+    /**
+     * Creates a new Exception with the given message.
+     *
+     * @param message the message to the user
+     */
+    public WrappingTableauException(final String message) {
+        super(message);
+    }
 }

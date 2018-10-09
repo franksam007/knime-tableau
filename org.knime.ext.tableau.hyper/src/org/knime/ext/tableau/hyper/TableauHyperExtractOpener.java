@@ -101,31 +101,47 @@ public class TableauHyperExtractOpener implements TableauExtractOpener {
         public TableauTable createTable(final String name, final DataTableSpec spec) throws WrappingTableauException {
             try {
                 // Get the type setters and create the table definition
-                final List<TableauTypeSetter> typeSetters = new ArrayList<>();
-                final TableDefinition tableDef = new TableDefinition();
-                tableDef.setDefaultCollation(Collation.EN_US);
-                for (int i = 0; i < spec.getNumColumns(); i++) {
-                    final DataColumnSpec colSpec = spec.getColumnSpec(i);
-                    final Optional<TableauTypeSetter> typeSetter = toTableType(colSpec, i);
-                    if (typeSetter.isPresent()) {
-                        final TableauTypeSetter t = typeSetter.get();
-                        typeSetters.add(t);
-                        tableDef.addColumn(t.getColSpec().getName(), t.getType());
-                    }
-                }
+                final TableauTypeSetter[] typeSetters = createTypeSetters(spec);
+                final TableDefinition tableDef = createTableDefinition(typeSetters);
 
                 // Create the table
-                final Table table = m_extract.addTable(name, tableDef);
-                return new TableauHyperTable(table, typeSetters.toArray(new TableauTypeSetter[0]));
+                return new TableauHyperTable(m_extract.addTable(name, tableDef), typeSetters);
             } catch (final TableauException e) {
                 throw new WrappingTableauException(e);
             }
         }
 
         @Override
-        public TableauTable openTable(final String name) throws WrappingTableauException {
-            // TODO implement
-            throw new UnsupportedOperationException("Not yet implemented.");
+        public TableauTable openTable(final String name, final DataTableSpec spec) throws WrappingTableauException {
+            try {
+                // Get the type setters and create the table definition
+                final TableauTypeSetter[] typeSetters = createTypeSetters(spec);
+                final TableDefinition tableDef = createTableDefinition(typeSetters);
+
+                final Table table = m_extract.openTable(name);
+
+                // TODO check if equals is implemented correctly
+                if (!isCompatible(tableDef, table.getTableDefinition())) {
+                    throw new WrappingTableauException("The extract contains a table with the name '" + name
+                        + "' but with a different table definition. "
+                        + "If you want to append to an existing table make sure the table is still the same. "
+                        + "If you want to overwite the existing table choose 'Overwrite' in the node configuration.");
+                }
+
+                // Create the table
+                return new TableauHyperTable(table, typeSetters);
+            } catch (final TableauException e) {
+                throw new WrappingTableauException(e);
+            }
+        }
+
+        @Override
+        public boolean hasTable(final String name) throws WrappingTableauException {
+            try {
+                return m_extract.hasTable(name);
+            } catch (final TableauException e) {
+                throw new WrappingTableauException(e);
+            }
         }
 
         @Override
@@ -152,6 +168,48 @@ public class TableauHyperExtractOpener implements TableauExtractOpener {
                     (r, i, c) -> r.setCharString(i, ((StringValue)c).getStringValue())));
             }
             return Optional.empty();
+        }
+
+        private static TableauTypeSetter[] createTypeSetters(final DataTableSpec spec) {
+            final List<TableauTypeSetter> typeSetters = new ArrayList<>();
+            for (int i = 0; i < spec.getNumColumns(); i++) {
+                final DataColumnSpec colSpec = spec.getColumnSpec(i);
+                toTableType(colSpec, i).ifPresent(t -> typeSetters.add(t));
+            }
+            return typeSetters.toArray(new TableauTypeSetter[0]);
+        }
+
+        private static TableDefinition createTableDefinition(final TableauTypeSetter[] typeSetters)
+            throws TableauException {
+            final TableDefinition tableDef = new TableDefinition();
+            tableDef.setDefaultCollation(Collation.EN_US);
+            for (final TableauTypeSetter t : typeSetters) {
+                tableDef.addColumn(t.getColSpec().getName(), t.getType());
+            }
+            return tableDef;
+        }
+
+        private static boolean isCompatible(final TableDefinition a, final TableDefinition b) throws TableauException {
+            // Compare the column count
+            if (a.getColumnCount() != b.getColumnCount()) {
+                return false;
+            }
+            // Compare the name and type of each column
+            for (int i = 0; i < a.getColumnCount(); i++) {
+                if (!a.getColumnName(i).equals(b.getColumnName(i))) {
+                    return false;
+                } else {
+                    Type aType = a.getColumnType(i);
+                    Type bType = b.getColumnType(i);
+                    if (!aType.equals(bType)) {
+                        if (!((aType.equals(Type.CHAR_STRING) && bType.equals(Type.UNICODE_STRING))
+                            || (aType.equals(Type.UNICODE_STRING) && bType.equals(Type.CHAR_STRING)))) {
+                            return false;
+                        }
+                    }
+                }
+            }
+            return true;
         }
     }
 

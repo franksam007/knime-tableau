@@ -48,23 +48,29 @@
  */
 package org.knime.ext.tableau.extractwrite;
 
+import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.util.Arrays;
 
-import javax.swing.JCheckBox;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.ButtonGroup;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 
 import org.knime.core.data.DataTableSpec;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeDialogPane;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
+import org.knime.core.node.NotConfigurableException;
 import org.knime.core.node.util.FilesHistoryPanel;
 import org.knime.core.node.util.FilesHistoryPanel.LocationValidation;
 import org.knime.core.node.workflow.FlowVariable.Type;
+import org.knime.ext.tableau.extractwrite.TableauExtractSettings.FileOverwritePolicy;
 
 /**
  * Dialog for TDE Writer
@@ -76,7 +82,11 @@ public final class TableauExtractNodeDialogPane extends NodeDialogPane {
 
     private final FilesHistoryPanel m_filePanel;
 
-    private final JCheckBox m_overwriteChecker;
+    private final JRadioButton m_overwritePolicyAbortButton;
+
+    private final JRadioButton m_overwritePolicyAppendButton;
+
+    private final JRadioButton m_overwritePolicyOverwriteButton;
 
     private final String[] m_fileExtensions;
 
@@ -92,7 +102,16 @@ public final class TableauExtractNodeDialogPane extends NodeDialogPane {
             new FilesHistoryPanel(createFlowVariableModel(TableauExtractSettings.CFG_OUTPUT_LOCATION, Type.STRING),
                 historyId, LocationValidation.FileOutput, fileExtensions);
         m_filePanel.setDialogTypeSaveWithExtension(fileExtensions[0]);
-        m_overwriteChecker = new JCheckBox("Overwrite OK");
+
+        // Overwrite policy buttons
+        m_overwritePolicyAppendButton = new JRadioButton("Append");
+        m_overwritePolicyOverwriteButton = new JRadioButton("Overwrite");
+        m_overwritePolicyAbortButton = new JRadioButton("Abort");
+        final ButtonGroup bg = new ButtonGroup();
+        bg.add(m_overwritePolicyAppendButton);
+        bg.add(m_overwritePolicyOverwriteButton);
+        bg.add(m_overwritePolicyAbortButton);
+
         addTab("Extract Settings", initPanel());
     }
 
@@ -110,7 +129,25 @@ public final class TableauExtractNodeDialogPane extends NodeDialogPane {
         gbc.gridy += 1;
 
         gbc.gridx = 1;
-        p.add(m_overwriteChecker, gbcComponent(gbc));
+        p.add(new JLabel(" If file exists... "), gbc);
+        gbc.gridy += 1;
+
+        // Overwrite policy settings (copied from csv writer)
+        final JPanel overwriteFilePane = new JPanel();
+        overwriteFilePane.setLayout(new BoxLayout(overwriteFilePane, BoxLayout.X_AXIS));
+        m_overwritePolicyOverwriteButton.setAlignmentY(Component.TOP_ALIGNMENT);
+        overwriteFilePane.add(m_overwritePolicyOverwriteButton);
+        overwriteFilePane.add(Box.createHorizontalStrut(20));
+        m_overwritePolicyAppendButton.setAlignmentY(Component.TOP_ALIGNMENT);
+        overwriteFilePane.add(m_overwritePolicyAppendButton);
+        overwriteFilePane.add(Box.createHorizontalStrut(20));
+        m_overwritePolicyAbortButton.setAlignmentY(Component.TOP_ALIGNMENT);
+        overwriteFilePane.add(m_overwritePolicyAbortButton);
+        overwriteFilePane.add(Box.createHorizontalGlue());
+
+        p.add(overwriteFilePane, gbc);
+
+        m_overwritePolicyAbortButton.doClick();
         return p;
     }
 
@@ -129,11 +166,27 @@ public final class TableauExtractNodeDialogPane extends NodeDialogPane {
     }
 
     @Override
-    protected void loadSettingsFrom(final NodeSettingsRO settings, final DataTableSpec[] specs) {
-        final TableauExtractSettings s = new TableauExtractSettings().loadSettingsInDialog(settings);
+    protected void loadSettingsFrom(final NodeSettingsRO settings, final DataTableSpec[] specs)
+        throws NotConfigurableException {
+        final TableauExtractSettings s;
+        try {
+            s = new TableauExtractSettings().loadSettings(settings);
+        } catch (InvalidSettingsException e) {
+            throw new NotConfigurableException(e.getMessage(), e);
+        }
         m_filePanel.updateHistory();
         m_filePanel.setSelectedFile(s.getOutputLocation());
-        m_overwriteChecker.setSelected(s.isOverwriteOK());
+        switch (s.getFileOverwritePolicy()) {
+            case Append:
+                m_overwritePolicyAppendButton.doClick();
+                break;
+            case Overwrite:
+                m_overwritePolicyOverwriteButton.doClick();
+                break;
+            case Abort:
+                m_overwritePolicyAbortButton.doClick();
+                break;
+        }
     }
 
     @Override
@@ -150,7 +203,13 @@ public final class TableauExtractNodeDialogPane extends NodeDialogPane {
         }
         final TableauExtractSettings s = new TableauExtractSettings();
         s.setOutputLocation(m_filePanel.getSelectedFile());
-        s.setOverwriteOK(m_overwriteChecker.isSelected());
+        if (m_overwritePolicyAppendButton.isSelected()) {
+            s.setFileOverwritePolicy(FileOverwritePolicy.Append);
+        } else if (m_overwritePolicyOverwriteButton.isSelected()) {
+            s.setFileOverwritePolicy(FileOverwritePolicy.Overwrite);
+        } else {
+            s.setFileOverwritePolicy(FileOverwritePolicy.Abort);
+        }
         s.saveSettings(settings);
     }
 

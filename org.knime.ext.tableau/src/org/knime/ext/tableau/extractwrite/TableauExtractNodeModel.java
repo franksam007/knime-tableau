@@ -67,6 +67,7 @@ import org.knime.ext.tableau.TableauExtract;
 import org.knime.ext.tableau.TableauExtractAPI;
 import org.knime.ext.tableau.TableauExtractOpener;
 import org.knime.ext.tableau.TableauTable;
+import org.knime.ext.tableau.extractwrite.TableauExtractSettings.FileOverwritePolicy;
 
 /**
  * Model for Tableau Extract writer nodes.
@@ -99,7 +100,9 @@ public final class TableauExtractNodeModel extends NodeModel {
     @Override
     protected DataTableSpec[] configure(final DataTableSpec[] inSpecs) throws InvalidSettingsException {
         CheckUtils.checkSettingNotNull(m_settings, "No configuration available");
-        setWarningMessage(CheckUtils.checkDestinationFile(m_settings.getOutputLocation(), m_settings.isOverwriteOK()));
+        final boolean overwrite = m_settings.getFileOverwritePolicy() == FileOverwritePolicy.Overwrite;
+        final boolean append = m_settings.getFileOverwritePolicy() == FileOverwritePolicy.Append;
+        setWarningMessage(CheckUtils.checkDestinationFile(m_settings.getOutputLocation(), overwrite, append));
         return new DataTableSpec[]{};
     }
 
@@ -111,9 +114,9 @@ public final class TableauExtractNodeModel extends NodeModel {
         final long rowCount = table.size();
         final File f = FileUtil.getFileFromURL(FileUtil.toURL(m_settings.getOutputLocation()));
         if (f.exists()) {
-            if (m_settings.isOverwriteOK()) {
+            if (m_settings.getFileOverwritePolicy() == FileOverwritePolicy.Overwrite) {
                 f.delete();
-            } else {
+            } else if (m_settings.getFileOverwritePolicy() == FileOverwritePolicy.Abort) {
                 throw new InvalidSettingsException(
                     String.format("Output file \"%s\" already exists " + "- must not overwrite as per user setting",
                         f.getAbsolutePath()));
@@ -122,9 +125,17 @@ public final class TableauExtractNodeModel extends NodeModel {
         synchronized (m_extractAPI.getClass()) {
             m_extractAPI.initialize();
             try (final TableauExtract tableauExtract = m_extractCreator.openExtract(f.getAbsolutePath())) {
-                // Create the new table
-                final TableauTable tableWriter =
-                    tableauExtract.createTable(EXTRACT_TABLE_NAME, table.getDataTableSpec());
+                TableauTable tableWriter = null;
+                if (m_settings.getFileOverwritePolicy() == FileOverwritePolicy.Append) {
+                    // If the extract contains this table: Open it
+                    if (tableauExtract.hasTable(EXTRACT_TABLE_NAME)) {
+                        tableWriter = tableauExtract.openTable(EXTRACT_TABLE_NAME, table.getDataTableSpec());
+                    }
+                }
+                if (tableWriter == null) {
+                    // Create the new table
+                    tableWriter = tableauExtract.createTable(EXTRACT_TABLE_NAME, table.getDataTableSpec());
+                }
                 // Add rows to the table
                 for (final DataRow r : table) {
                     tableWriter.addRow(r);
@@ -148,12 +159,12 @@ public final class TableauExtractNodeModel extends NodeModel {
 
     @Override
     protected void validateSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
-        new TableauExtractSettings().loadSettingsInModel(settings);
+        new TableauExtractSettings().loadSettings(settings);
     }
 
     @Override
     protected void loadValidatedSettingsFrom(final NodeSettingsRO settings) throws InvalidSettingsException {
-        m_settings = new TableauExtractSettings().loadSettingsInModel(settings);
+        m_settings = new TableauExtractSettings().loadSettings(settings);
     }
 
     @Override
