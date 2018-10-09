@@ -48,19 +48,20 @@
  */
 package org.knime.ext.tableau;
 
-import org.knime.core.data.DataRow;
-
 /**
  *
  * @author Benjamin Wilhelm, KNIME GmbH, Konstanz, Germany
  */
-public interface TableauExtractWriter extends AutoCloseable {
+public interface TableauExtractOpener {
 
     /**
-     * Adds a row to the extract.
+     * Opens a new extract at the given location where tables could be added, overwritten or extended. Note that the
+     * caller is responsible for closing the {@link TableauExtract}.
      *
-     * @param dataRow the row
+     * @param path path to the extract file
+     * @return a {@link TableauExtract} which can be used to open tables
      * @throws WrappingTableauException if the Tableau API throws a TableauException (not documented on Tableau side)
      */
-    void addRow(DataRow dataRow) throws WrappingTableauException;
+    TableauExtract openExtract(String path) throws WrappingTableauException;
+
 }

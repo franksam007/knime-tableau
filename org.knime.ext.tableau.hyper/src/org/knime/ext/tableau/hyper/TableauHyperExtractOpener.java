@@ -44,9 +44,9 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   Feb 5, 2016 (wiswedel): created
+ *   Oct 9, 2018 (bw): created
  */
-package org.knime.ext.tableau.tde;
+package org.knime.ext.tableau.hyper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -61,84 +61,76 @@ import org.knime.core.data.DataType;
 import org.knime.core.data.DoubleValue;
 import org.knime.core.data.IntValue;
 import org.knime.core.data.StringValue;
-import org.knime.ext.tableau.TableauExtractCreator;
-import org.knime.ext.tableau.TableauExtractWriter;
+import org.knime.ext.tableau.TableauExtract;
+import org.knime.ext.tableau.TableauExtractOpener;
+import org.knime.ext.tableau.TableauTable;
 import org.knime.ext.tableau.WrappingTableauException;
 
 import com.tableausoftware.TableauException;
 import com.tableausoftware.common.Collation;
 import com.tableausoftware.common.Type;
-import com.tableausoftware.extract.Extract;
-import com.tableausoftware.extract.Row;
-import com.tableausoftware.extract.Table;
-import com.tableausoftware.extract.TableDefinition;
+import com.tableausoftware.hyperextract.Extract;
+import com.tableausoftware.hyperextract.Row;
+import com.tableausoftware.hyperextract.Table;
+import com.tableausoftware.hyperextract.TableDefinition;
 
 /**
  * @author Bernd Wiswedel, KNIME AG, Zurich, Switzerland
  * @author Benjamin Wilhelm, KNIME GmbH, Konstanz, Germany
  */
-public final class TableauTDEExtractWriter implements TableauExtractWriter {
-
-    private Table m_table;
-
-    private TableauTypeSetter[] m_typeSetters;
-
-    private Extract m_extract;
-
-    private TableauTDEExtractWriter(final TableauTypeSetter[] typeSetters, final String path)
-        throws WrappingTableauException {
-        try {
-            m_typeSetters = typeSetters;
-            TableDefinition tableDef = new TableDefinition();
-            tableDef.setDefaultCollation(Collation.EN_US);
-            for (int i = 0; i < typeSetters.length; i++) {
-                TableauTypeSetter tableauTypeSetter = typeSetters[i];
-                tableDef.addColumn(tableauTypeSetter.getColSpec().getName(), tableauTypeSetter.getType());
-            }
-            m_extract = new Extract(path);
-            m_table = m_extract.addTable("Extract", tableDef);
-        } catch (final TableauException e) {
-            throw new WrappingTableauException(e);
-        }
-    }
+public class TableauHyperExtractOpener implements TableauExtractOpener {
 
     @Override
-    public void addRow(final DataRow dataRow) throws WrappingTableauException {
-        try {
-            Row row = new Row(m_table.getTableDefinition());
-            for (int i = 0; i < m_typeSetters.length; i++) {
-                TableauTypeSetter typeSetter = m_typeSetters[i];
-                DataCell c = dataRow.getCell(typeSetter.getColIndex());
-                typeSetter.addToRow(i, row, c);
+    public TableauExtract openExtract(final String path) throws WrappingTableauException {
+        return new TableauHyperExtract(path);
+    }
+
+    private static class TableauHyperExtract implements TableauExtract {
+
+        private final Extract m_extract;
+
+        TableauHyperExtract(final String path) throws WrappingTableauException {
+            try {
+                m_extract = new Extract(path);
+            } catch (final TableauException e) {
+                throw new WrappingTableauException(e);
             }
-            m_table.insert(row);
-        } catch (final TableauException e) {
-            throw new WrappingTableauException(e);
         }
-    }
-
-    @Override
-    public void close() throws Exception {
-        m_extract.close();
-    }
-
-    /**
-     * A {@link TableauExtractCreator} which uses the tableausdk and writes to tde files.
-     */
-    public static class TableauTDEExtractCreator implements TableauExtractCreator {
 
         @Override
-        public TableauExtractWriter createExtract(final String path, final DataTableSpec spec)
-            throws WrappingTableauException {
-            final List<TableauTypeSetter> typeSetters = new ArrayList<>();
-            for (int i = 0; i < spec.getNumColumns(); i++) {
-                final DataColumnSpec colSpec = spec.getColumnSpec(i);
-                final Optional<TableauTypeSetter> tableType = toTableType(colSpec, i);
-                if (tableType.isPresent()) {
-                    typeSetters.add(tableType.get());
+        public TableauTable createTable(final String name, final DataTableSpec spec) throws WrappingTableauException {
+            try {
+                // Get the type setters and create the table definition
+                final List<TableauTypeSetter> typeSetters = new ArrayList<>();
+                final TableDefinition tableDef = new TableDefinition();
+                tableDef.setDefaultCollation(Collation.EN_US);
+                for (int i = 0; i < spec.getNumColumns(); i++) {
+                    final DataColumnSpec colSpec = spec.getColumnSpec(i);
+                    final Optional<TableauTypeSetter> typeSetter = toTableType(colSpec, i);
+                    if (typeSetter.isPresent()) {
+                        final TableauTypeSetter t = typeSetter.get();
+                        typeSetters.add(t);
+                        tableDef.addColumn(t.getColSpec().getName(), t.getType());
+                    }
                 }
+
+                // Create the table
+                final Table table = m_extract.addTable(name, tableDef);
+                return new TableauHyperTable(table, typeSetters.toArray(new TableauTypeSetter[0]));
+            } catch (final TableauException e) {
+                throw new WrappingTableauException(e);
             }
-            return new TableauTDEExtractWriter(typeSetters.toArray(new TableauTypeSetter[0]), path);
+        }
+
+        @Override
+        public TableauTable openTable(final String name) throws WrappingTableauException {
+            // TODO implement
+            throw new UnsupportedOperationException("Not yet implemented.");
+        }
+
+        @Override
+        public void close() throws Exception {
+            m_extract.close();
         }
 
         private static Optional<TableauTypeSetter> toTableType(final DataColumnSpec colSpec, final int colIndex) {
@@ -163,7 +155,34 @@ public final class TableauTDEExtractWriter implements TableauExtractWriter {
         }
     }
 
-    // TODO think about extracting this into own classes
+    private static class TableauHyperTable implements TableauTable {
+
+        private final Table m_table;
+
+        private final TableauTypeSetter[] m_typeSetters;
+
+        public TableauHyperTable(final Table table, final TableauTypeSetter[] typeSetters) {
+            m_table = table;
+            m_typeSetters = typeSetters;
+        }
+
+        @Override
+        public void addRow(final DataRow dataRow) throws WrappingTableauException {
+            try {
+                final Row row = new Row(m_table.getTableDefinition());
+                for (int i = 0; i < m_typeSetters.length; i++) {
+                    final TableauTypeSetter typeSetter = m_typeSetters[i];
+                    final DataCell c = dataRow.getCell(typeSetter.getColIndex());
+                    typeSetter.addToRow(i, row, c);
+                }
+                m_table.insert(row);
+            } catch (final TableauException e) {
+                throw new WrappingTableauException(e);
+            }
+        }
+
+    }
+
     private static final class TableauTypeSetter {
 
         private final DataColumnSpec m_colSpec;
@@ -208,5 +227,4 @@ public final class TableauTDEExtractWriter implements TableauExtractWriter {
     private interface CellWriter {
         public void addCell(final Row row, final int index, final DataCell cell) throws TableauException;
     }
-
 }

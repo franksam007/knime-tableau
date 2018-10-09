@@ -44,47 +44,21 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   Feb 5, 2016 (wiswedel): created
+ *   Oct 9, 2018 (bw): created
  */
-package org.knime.ext.tableau.tde.write;
+package org.knime.ext.tableau;
 
-import org.knime.core.node.NodeDialogPane;
-import org.knime.core.node.NodeFactory;
-import org.knime.core.node.NodeView;
-import org.knime.ext.tableau.extractwrite.TableauExtractNodeDialogPane;
-import org.knime.ext.tableau.extractwrite.TableauExtractNodeModel;
-import org.knime.ext.tableau.tde.TableauTDEExtractAPI;
-import org.knime.ext.tableau.tde.TableauTDEExtractOpener;
+import org.knime.core.data.DataTableSpec;
 
 /**
+ *
  * @author Benjamin Wilhelm, KNIME GmbH, Konstanz, Germany
  */
-public final class TableauDENodeFactory extends NodeFactory<TableauExtractNodeModel> {
+public interface TableauExtract extends AutoCloseable {
 
-    @Override
-    public TableauExtractNodeModel createNodeModel() {
-        return new TableauExtractNodeModel(new TableauTDEExtractAPI(), new TableauTDEExtractOpener());
-    }
+    TableauTable createTable(String name, DataTableSpec spec) throws WrappingTableauException;
 
-    @Override
-    protected int getNrNodeViews() {
-        return 0;
-    }
+    TableauTable openTable(String name) throws WrappingTableauException;
 
-    @Override
-    public NodeView<TableauExtractNodeModel> createNodeView(final int viewIndex,
-        final TableauExtractNodeModel nodeModel) {
-        return null;
-    }
-
-    @Override
-    protected boolean hasDialog() {
-        return true;
-    }
-
-    @Override
-    protected NodeDialogPane createNodeDialogPane() {
-        return new TableauExtractNodeDialogPane("org.knime.ext.tableau.tdewrite", ".tde");
-    }
-
+    // TODO
 }

@@ -65,8 +65,9 @@ import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.util.CheckUtils;
 import org.knime.core.util.FileUtil;
-import org.knime.ext.tableau.TableauExtractWriter;
-import org.knime.ext.tableau.tde.TableauTDEExtractWriter;
+import org.knime.ext.tableau.TableauExtract;
+import org.knime.ext.tableau.TableauTable;
+import org.knime.ext.tableau.tde.TableauTDEExtractOpener;
 
 import com.tableausoftware.extract.ExtractAPI;
 import com.tableausoftware.server.ServerAPI;
@@ -77,6 +78,8 @@ import com.tableausoftware.server.ServerConnection;
  * @author wiswedel
  */
 final class SendToTableauNodeModel extends NodeModel {
+
+    private static final String EXTRACT_TABLE_NAME = "Extract";
 
     private SendToTableauSettings m_settings;
 
@@ -104,9 +107,11 @@ final class SendToTableauNodeModel extends NodeModel {
         try {
             getLogger().debugWithFormat("Will write temporary tableau file to \"%s\"", t.getAbsolutePath());
             ExtractAPI.initialize();
-            try (TableauExtractWriter tableWriter = new TableauTDEExtractWriter.TableauTDEExtractCreator()
-                .createExtract(t.getAbsolutePath(), table.getDataTableSpec())) {
-                // This part works ok
+            try (final TableauExtract tableauExtract = new TableauTDEExtractOpener().openExtract(t.getAbsolutePath())) {
+                // Create the new table
+                final TableauTable tableWriter =
+                    tableauExtract.createTable(EXTRACT_TABLE_NAME, table.getDataTableSpec());
+                // Add rows to the table
                 for (DataRow r : table) {
                     tableWriter.addRow(r);
                     exec.setProgress((double)++rowIndex / rowCount,

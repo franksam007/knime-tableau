@@ -48,21 +48,19 @@
  */
 package org.knime.ext.tableau;
 
-import org.knime.core.data.DataTableSpec;
+import org.knime.core.data.DataRow;
 
 /**
  *
  * @author Benjamin Wilhelm, KNIME GmbH, Konstanz, Germany
  */
-public interface TableauExtractCreator {
+public interface TableauTable {
 
     /**
-     * Creates a new extract at the given location with the given spec that can be filled with rows.
+     * Adds a row to the table.
      *
-     * @param path path to the new extract file
-     * @param spec the data table spec of table to save
-     * @return a {@link TableauExtractWriter} which can be used to add rows to the table
+     * @param dataRow the row
      * @throws WrappingTableauException if the Tableau API throws a TableauException (not documented on Tableau side)
      */
-    TableauExtractWriter createExtract(String path, DataTableSpec spec) throws WrappingTableauException;
+    void addRow(DataRow dataRow) throws WrappingTableauException;
 }

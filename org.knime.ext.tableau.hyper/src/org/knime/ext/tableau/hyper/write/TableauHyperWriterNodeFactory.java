@@ -54,7 +54,7 @@ import org.knime.core.node.NodeView;
 import org.knime.ext.tableau.extractwrite.TableauExtractNodeDialogPane;
 import org.knime.ext.tableau.extractwrite.TableauExtractNodeModel;
 import org.knime.ext.tableau.hyper.TableauHyperExtractAPI;
-import org.knime.ext.tableau.hyper.TableauHyperExtractWriter;
+import org.knime.ext.tableau.hyper.TableauHyperExtractOpener;
 
 /**
  * Factory for the Tableau Hyper Writer node.
@@ -66,8 +66,7 @@ public final class TableauHyperWriterNodeFactory extends NodeFactory<TableauExtr
 
     @Override
     public TableauExtractNodeModel createNodeModel() {
-        return new TableauExtractNodeModel(new TableauHyperExtractAPI(),
-            new TableauHyperExtractWriter.TableauTDEExtractCreator());
+        return new TableauExtractNodeModel(new TableauHyperExtractAPI(), new TableauHyperExtractOpener());
     }
 
     @Override

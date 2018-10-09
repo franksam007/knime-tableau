@@ -63,9 +63,10 @@ import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.util.CheckUtils;
 import org.knime.core.util.FileUtil;
+import org.knime.ext.tableau.TableauExtract;
 import org.knime.ext.tableau.TableauExtractAPI;
-import org.knime.ext.tableau.TableauExtractCreator;
-import org.knime.ext.tableau.TableauExtractWriter;
+import org.knime.ext.tableau.TableauExtractOpener;
+import org.knime.ext.tableau.TableauTable;
 
 /**
  * Model for Tableau Extract writer nodes.
@@ -75,9 +76,11 @@ import org.knime.ext.tableau.TableauExtractWriter;
  */
 public final class TableauExtractNodeModel extends NodeModel {
 
+    private final static String EXTRACT_TABLE_NAME = "Extract";
+
     private final TableauExtractAPI m_extractAPI;
 
-    private final TableauExtractCreator m_extractCreator;
+    private final TableauExtractOpener m_extractCreator;
 
     private TableauExtractSettings m_settings;
 
@@ -85,12 +88,12 @@ public final class TableauExtractNodeModel extends NodeModel {
      * Creates a new node model for writing tableau extracts.
      *
      * @param extractAPI the wrapper to the ExtractAPI to use
-     * @param extractCreator the tableau extract creator to use
+     * @param extractOpener the tableau extract creator to use
      */
-    public TableauExtractNodeModel(final TableauExtractAPI extractAPI, final TableauExtractCreator extractCreator) {
+    public TableauExtractNodeModel(final TableauExtractAPI extractAPI, final TableauExtractOpener extractOpener) {
         super(1, 0);
         m_extractAPI = extractAPI;
-        m_extractCreator = extractCreator;
+        m_extractCreator = extractOpener;
     }
 
     @Override
@@ -118,9 +121,11 @@ public final class TableauExtractNodeModel extends NodeModel {
         }
         synchronized (m_extractAPI.getClass()) {
             m_extractAPI.initialize();
-            try (final TableauExtractWriter tableWriter =
-                m_extractCreator.createExtract(f.getAbsolutePath(), table.getDataTableSpec())) {
-                // This part works ok
+            try (final TableauExtract tableauExtract = m_extractCreator.openExtract(f.getAbsolutePath())) {
+                // Create the new table
+                final TableauTable tableWriter =
+                    tableauExtract.createTable(EXTRACT_TABLE_NAME, table.getDataTableSpec());
+                // Add rows to the table
                 for (final DataRow r : table) {
                     tableWriter.addRow(r);
                     exec.setProgress((double)++rowIndex / rowCount,
