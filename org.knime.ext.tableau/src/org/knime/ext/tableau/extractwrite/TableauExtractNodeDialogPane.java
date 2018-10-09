@@ -52,6 +52,9 @@ import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.io.File;
+import java.net.MalformedURLException;
+import java.nio.file.InvalidPathException;
 import java.util.Arrays;
 
 import javax.swing.Box;
@@ -70,6 +73,7 @@ import org.knime.core.node.NotConfigurableException;
 import org.knime.core.node.util.FilesHistoryPanel;
 import org.knime.core.node.util.FilesHistoryPanel.LocationValidation;
 import org.knime.core.node.workflow.FlowVariable.Type;
+import org.knime.core.util.FileUtil;
 import org.knime.ext.tableau.extractwrite.TableauExtractSettings.FileOverwritePolicy;
 
 /**
@@ -191,8 +195,13 @@ public final class TableauExtractNodeDialogPane extends NodeDialogPane {
 
     @Override
     protected void saveSettingsTo(final NodeSettingsWO settings) throws InvalidSettingsException {
+        final TableauExtractSettings s = new TableauExtractSettings();
+
+        // Get the selected file
+        final String selectedFile = m_filePanel.getSelectedFile();
+
         // Check if the file path ends with one of the given valid extensions
-        if (Arrays.stream(m_fileExtensions).noneMatch(e -> m_filePanel.getSelectedFile().endsWith(e))) {
+        if (Arrays.stream(m_fileExtensions).noneMatch(e -> selectedFile.endsWith(e))) {
             if (m_fileExtensions.length == 1) {
                 throw new InvalidSettingsException(
                     "The file must end with the extension '" + m_fileExtensions[0] + "'.");
@@ -201,8 +210,21 @@ public final class TableauExtractNodeDialogPane extends NodeDialogPane {
                     "The file must end with one of the extensions [" + String.join(",", m_fileExtensions) + "].");
             }
         }
-        final TableauExtractSettings s = new TableauExtractSettings();
-        s.setOutputLocation(m_filePanel.getSelectedFile());
+
+        // Check if the file is a local file
+        final File file;
+        try {
+            file = FileUtil.getFileFromURL(FileUtil.toURL(selectedFile));
+        } catch (final InvalidPathException | MalformedURLException e) {
+            throw new InvalidSettingsException(e);
+        }
+        if (file == null) {
+            throw new InvalidSettingsException("Only local files are allowed.");
+        }
+
+        s.setOutputLocation(selectedFile);
+
+        // Save the overwrite policy
         if (m_overwritePolicyAppendButton.isSelected()) {
             s.setFileOverwritePolicy(FileOverwritePolicy.Append);
         } else if (m_overwritePolicyOverwriteButton.isSelected()) {
