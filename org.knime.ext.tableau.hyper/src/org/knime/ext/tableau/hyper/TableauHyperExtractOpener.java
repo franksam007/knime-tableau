@@ -48,6 +48,9 @@
  */
 package org.knime.ext.tableau.hyper;
 
+import java.time.Duration;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -61,6 +64,9 @@ import org.knime.core.data.DataType;
 import org.knime.core.data.DoubleValue;
 import org.knime.core.data.IntValue;
 import org.knime.core.data.StringValue;
+import org.knime.core.data.time.duration.DurationValue;
+import org.knime.core.data.time.localdate.LocalDateValue;
+import org.knime.core.data.time.localdatetime.LocalDateTimeValue;
 import org.knime.ext.tableau.TableauExtract;
 import org.knime.ext.tableau.TableauExtractOpener;
 import org.knime.ext.tableau.TableauTable;
@@ -162,6 +168,39 @@ public class TableauHyperExtractOpener implements TableauExtractOpener {
             if (type.isCompatible(DoubleValue.class)) {
                 return Optional.of(new TableauTypeSetter(colSpec, colIndex, Type.DOUBLE,
                     (r, i, c) -> r.setDouble(i, ((DoubleValue)c).getDoubleValue())));
+            }
+            if (type.isCompatible(LocalDateValue.class)) {
+                return Optional.of(new TableauTypeSetter(colSpec, colIndex, Type.DATE, (r, i, c) -> {
+                    final LocalDate date = ((LocalDateValue)c).getLocalDate();
+                    r.setDate(i, date.getYear(), date.getMonthValue(), date.getDayOfMonth());
+                }));
+            }
+            if (type.isCompatible(LocalDateTimeValue.class)) {
+                return Optional.of(new TableauTypeSetter(colSpec, colIndex, Type.DATETIME, (r, i, c) -> {
+                    final LocalDateTime dateTime = ((LocalDateTimeValue)c).getLocalDateTime();
+                    // Chose this because of the range of frac which is between 0 and 10000
+                    final int fracs = (int)(dateTime.getNano() / 10e5);
+                    r.setDateTime(i, dateTime.getYear(), dateTime.getMonthValue(), dateTime.getDayOfMonth(),
+                        dateTime.getHour(), dateTime.getMinute(), dateTime.getSecond(), fracs);
+                }));
+            }
+            if (type.isCompatible(DurationValue.class)) {
+                return Optional.of(new TableauTypeSetter(colSpec, colIndex, Type.DURATION, (r, i, c) -> {
+                    final Duration duration = ((DurationValue)c).getDuration();
+                    try {
+                        final int days = Math.toIntExact(duration.toDays());
+                        final int hours = (int)(duration.toHours() % 24);
+                        final int minutes = (int)(duration.toMinutes() % 60);
+                        final int seconds = (int)(duration.getSeconds() % 60);
+                        // Chose this because of the range of frac which is between 0 and 10000
+                        final int fracs = (int)(duration.getNano() / 10e5);
+                        r.setDuration(i, days, hours, minutes, seconds, fracs);
+                    } catch (final ArithmeticException e) {
+                        throw new IllegalArgumentException(
+                            "Can't write durations with more than 2^31-1 days to Tableau cell "
+                                + "because of Tableau API limitations.");
+                    }
+                }));
             }
             if (type.isCompatible(StringValue.class)) {
                 return Optional.of(new TableauTypeSetter(colSpec, colIndex, Type.CHAR_STRING,
