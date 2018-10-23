@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<knimeNode icon="./tableau_writer.png" type="Sink" xmlns="http://knime.org/node/v2.8" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://knime.org/node/v2.10 http://knime.org/node/v2.10.xsd">
+    <name>Send to Tableau Server (Hyper)</name>
+    
+    <shortDescription>
+        Sends the input data to a Tableau Server. 
+    </shortDescription>
+    
+    <fullDescription>
+        <intro>
+        	<p>
+            	Sends the input data to a Tableau Server. The node uses the Tableau SDK library to generate a TDE
+                file and, secondly, upload that TDE file to the Tableau Server.
+        	</p>
+       	</intro>
+        <tab name="Main Configuration">
+            <option name="Host">The URL of the server to connect to.</option>
+            <option name="Username">The username of the user to sign in as. The user must have permissions to publish to the specified site.</option>
+            <option name="Password">The password of the user to sign in as.</option>
+            <option name="SiteID">The site ID. Pass an empty string to connect to the default site.</option>
+            <option name="Project Name">The name of the project to publish the extract to.</option>
+            <option name="Data Source">The name of the data source to create on the server.</option>
+            <option name="Overwrite">If checked, overwrite an existing data source on the server that has the same name.</option>
+            <option name="Proxy Username/Password">The username and password for the HTTP proxy. This method is needed only if the server 
+                connection is going through a proxy that requires authentication and is required here as the Tableau library
+                does not inherit KNIME's proxy settings.</option>
+        </tab>
+        
+        <!-- This is copied in the tableau writer node. -->
+        <tab name="Installation">
+            <option name="">
+                <ol>
+                   <li>Download the Java version of the <a href="https://onlinehelp.tableau.com/current/api/sdk/en-us/help.htm#SDK/tableau_sdk_installing.htm%3FTocPath%3D_____3">
+                    Tableau SDK</a> for your system (Windows, Mac, or Linux).</li>
+                   <li>Extract the archive to a location of your choice.</li>
+                   <li>Update environment variables such as PATH on your system (see 
+                       <a href="https://onlinehelp.tableau.com/current/api/sdk/en-us/help.htm#SDK/tableau_sdk_using_java_eclipse.htm%3FTocPath%3D_____5">
+                          here</a>). If you are not familiar with setting variables on Windows, have a look at 
+                          <a href="http://www.computerhope.com/issues/ch000549.htm">this page</a>.</li>
+                   <li>On Windows systems:The library relies on the "Microsoft Visual Basic 2013 Redistributables" to be installed on the 
+                       system (for download from <a href="https://www.microsoft.com/en-US/download/details.aspx?id=40784">
+                       microsoft.com</a>)</li>
+                </ol>
+            </option>
+        </tab>
+    </fullDescription>
+    
+    <ports>
+        <inPort index="0" name="Data">Data to be sent to Tableau Server. Only primitive types 
+        (string, numbers, dates) are used.</inPort>
+    </ports>    
+</knimeNode>

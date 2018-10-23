@@ -4,14 +4,12 @@
 
    <extension point="org.knime.workbench.repository.nodes">
       <node
-            category-path="/labs/tableau/hyper"
+            category-path="/labs/tableau"
             factory-class="org.knime.ext.tableau.hyper.write.TableauHyperWriterNodeFactory">
       </node>
+      <node
+            category-path="/labs/tableau"
+            factory-class="org.knime.ext.tableau.hyper.sendtable.SendToTableauHyperNodeFactory">
+      </node>
    </extension>
-      
-   <extension point="org.knime.workbench.repository.categories">
-      <category description="KNIME Tableau Integration - Hyper format" icon="icons/tableau_category.png" level-id="hyper" name="Tableau" path="/labs/tableau">
-      </category>
-   </extension>
- 
 </plugin>
