@@ -30,9 +30,9 @@
                	       <a href="https://onlinehelp.tableau.com/current/api/sdk/en-us/help.htm#SDK/tableau_sdk_using_java_eclipse.htm%3FTocPath%3D_____5">
                           here</a>). If you are not familiar with setting variables on Windows, have a look at 
                           <a href="http://www.computerhope.com/issues/ch000549.htm">this page</a>.</li>
-              	   <li>On Windows systems:The library relies on the "Microsoft Visual Basic 2013 Redistributables" to be installed on the 
-               	       system (for download from <a href="https://www.microsoft.com/en-US/download/details.aspx?id=40784">
-               	       microsoft.com</a>)</li>
+                   <li>On Windows systems: The library relies on the "Visual C++ Redistributable Packages for Visual Studio 2013" to be installed on the
+                       system (for download from <a href="https://www.microsoft.com/en-US/download/details.aspx?id=40784">
+                       microsoft.com</a>)</li>
                	</ol>
            	</option>
        	</tab>
