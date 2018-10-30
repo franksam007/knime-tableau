@@ -9,7 +9,7 @@
             factory-class="org.knime.ext.tableau.tde.write.TableauDENodeFactory">
       </node>
       <node
-            after="org.knime.ext.tableau.tdewrite.TableauDENodeFactory"
+            after="org.knime.ext.tableau.tde.write.TableauDENodeFactory"
             category-path="/labs/tableau"
             factory-class="org.knime.ext.tableau.tde.sendtotableau.SendToTableauNodeFactory">
       </node>
