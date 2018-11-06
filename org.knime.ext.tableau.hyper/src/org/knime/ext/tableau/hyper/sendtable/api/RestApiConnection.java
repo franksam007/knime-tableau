@@ -80,8 +80,15 @@ import org.knime.ext.tableau.hyper.sendtable.api.binding.TsRequest;
 import org.knime.ext.tableau.hyper.sendtable.api.binding.TsResponse;
 
 /**
- * TODO link to tableau example + License
+ * A {@link RestApiConnection} represents a connection to the REST API of a tableau server. The connection can execute
+ * requests to the tableau server and handles the authentication.
  *
+ * This implementation is strongly adapted from the class RestAPIUtils from the tableau example
+ * (<a href="https://github.com/tableau/rest-api-samples/blob/master/LICENSE">MIT LICENSE</a>)
+ *
+ * @see <a href=
+ *      "https://github.com/tableau/rest-api-samples/blob/master/java/src/com/tableausoftware/documentation/api/rest/util/RestApiUtils.java">GitHub.com
+ *      - RestApiUtils.java</a>
  * @author Benjamin Wilhelm, KNIME GmbH, Konstanz, Germany
  */
 public class RestApiConnection {
@@ -178,12 +185,10 @@ public class RestApiConnection {
         int numReadBytes = 0;
         try (FileInputStream inputStream = new FileInputStream(dataSource)) {
             while ((numReadBytes = inputStream.read(buffer)) != -1) {
-                // TODO use return value?
                 invokeAppendFileUpload(fileUpload.getUploadSessionId(), datasourceName, buffer, numReadBytes);
             }
         }
 
-        // TODO support overwrite
         return invokePublishDataSource(fileUpload.getUploadSessionId(), datasourceName, datasourceType, projectId,
             overwrite, append);
     }
@@ -226,7 +231,7 @@ public class RestApiConnection {
         final List<Attachment> atts = new LinkedList<>();
 
         // First attachment: The xml body
-        final ContentDisposition cdBody = new ContentDisposition("name=\"request_payload\""); // TODO find out if necessary
+        final ContentDisposition cdBody = new ContentDisposition("name=\"request_payload\"");
         atts.add(new AttachmentBuilder().id("request_payload").mediaType(MediaType.TEXT_XML).contentDisposition(cdBody)
             .object(body).build());
 
@@ -252,7 +257,7 @@ public class RestApiConnection {
             .build(m_siteId).toString();
         final List<Attachment> atts = new LinkedList<>();
         final TsRequest payload = createPayloadToPublishDatasource(datasourceName, projectId);
-        final ContentDisposition cdBody = new ContentDisposition("name=\"request_payload\""); // TODO find out if necessary
+        final ContentDisposition cdBody = new ContentDisposition("name=\"request_payload\"");
         atts.add(new AttachmentBuilder().id("request_payload").mediaType(MediaType.TEXT_XML).contentDisposition(cdBody)
             .object(payload).build());
         final TsResponse response = postMultipart(url, m_token, atts);
@@ -264,7 +269,7 @@ public class RestApiConnection {
         return UriBuilder.fromPath(m_url + "/api/" + API_VERSION);
     }
 
-    private void checkSignedIn() throws IllegalStateException {
+    private void checkSignedIn() {
         if (!m_signedIn) {
             throw new IllegalStateException(
                 "Invoke login before communication with the server. This is a coding error.");
@@ -317,14 +322,14 @@ public class RestApiConnection {
     private static TsResponse checkResponse(final Response response) throws TsResponseException {
         if (response.getStatusInfo().getFamily() != Family.SUCCESSFUL) {
             try {
-                // TODO remove
-                StatusType statusInfo = response.getStatusInfo();
                 final ErrorType error = response.readEntity(TsResponse.class).getError();
                 final String message =
                     error.getSummary() + ": " + error.getDetail() + " (Error code: " + error.getCode() + ").";
                 throw new TsResponseException(message);
             } catch (final ProcessingException e) {
-                throw new TsResponseException("Invalid response from server: " + response.getStatusInfo(), e); // TODO
+                final StatusType statusInfo = response.getStatusInfo();
+                throw new TsResponseException("Invalid response from server: " + statusInfo.getReasonPhrase()
+                    + " (Error Code: " + statusInfo.getStatusCode() + ")", e);
             }
         }
         return response.readEntity(TsResponse.class);
