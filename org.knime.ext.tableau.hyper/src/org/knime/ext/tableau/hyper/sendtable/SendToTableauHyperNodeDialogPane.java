@@ -161,6 +161,10 @@ final class SendToTableauHyperNodeDialogPane extends NodeDialogPane {
         p.add(m_datasourceNamePanel, gbcComponent(gbc));
         gbc.gridy += 1;
 
+        gbc.gridx = 0;
+        p.add(new JLabel(" If file exists... "), gbcLabel(gbc));
+        gbc.gridx += 1;
+
         // Overwrite policy settings (copied from csv writer)
         final JPanel overwriteFilePane = new JPanel();
         overwriteFilePane.setLayout(new BoxLayout(overwriteFilePane, BoxLayout.X_AXIS));
