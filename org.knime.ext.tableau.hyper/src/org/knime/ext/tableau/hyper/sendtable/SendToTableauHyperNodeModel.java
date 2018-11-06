@@ -72,6 +72,8 @@ import org.knime.ext.tableau.hyper.TableauHyperExtractAPI;
 import org.knime.ext.tableau.hyper.TableauHyperExtractOpener;
 import org.knime.ext.tableau.hyper.sendtable.SendToTableauHyperSettings.FileOverwritePolicy;
 import org.knime.ext.tableau.hyper.sendtable.api.RestApiConnection;
+import org.knime.ext.tableau.hyper.sendtable.api.RestApiConnection.TsResponseException;
+import org.knime.ext.tableau.hyper.sendtable.api.binding.DataSourceListType;
 import org.knime.ext.tableau.hyper.sendtable.api.binding.ProjectListType;
 import org.knime.ext.tableau.hyper.sendtable.api.binding.ProjectType;
 
@@ -138,17 +140,45 @@ final class SendToTableauHyperNodeModel extends NodeModel {
         final RestApiConnection restApi = new RestApiConnection(m_settings.getHost());
 
         // Sign in
-        restApi.invokeSignIn(m_settings.getUsername(), m_settings.getPassword(), m_settings.getSiteContentURL());
-        final ProjectListType projects = restApi.invokeQueryProjects();
-        // TODO support projects with same name in different parent projects
-        final String projectId = getProjectId(projects, m_settings.getProjectName());
+        signIn(restApi);
+        final String projectId = findProjectId(restApi);
         final boolean overwrite = m_settings.getOverwrite() == FileOverwritePolicy.OVERWRITE;
         final boolean append = m_settings.getOverwrite() == FileOverwritePolicy.APPEND;
+        checkOverwriteAppend(restApi, projectId, overwrite, append);
         restApi.invokePublishDataSourceChunked(projectId, m_settings.getDatasourceName(), "hyper", f, overwrite, append,
             sendProgress);
 
         // Return an empty array
         return new BufferedDataTable[]{};
+    }
+
+    private void signIn(final RestApiConnection restApi) throws TsResponseException {
+        restApi.invokeSignIn(m_settings.getUsername(), m_settings.getPassword(), m_settings.getSiteContentURL());
+    }
+
+    private String findProjectId(final RestApiConnection restApi) throws TsResponseException {
+        final ProjectListType projects = restApi.invokeQueryProjects();
+        // TODO support projects with same name in different parent projects
+        return getProjectId(projects, m_settings.getProjectName());
+    }
+
+    private void checkOverwriteAppend(final RestApiConnection restApi, final String projectId, final boolean overwrite,
+        final boolean append) throws TsResponseException, InvalidSettingsException {
+        // TODO filter by name in request
+        final DataSourceListType datasources = restApi.invokeQueryDatasources();
+        final boolean exits = datasources.getDatasource().stream() //
+            .filter(d -> d.getName().equals(m_settings.getDatasourceName())) //
+            .anyMatch(d -> d.getProject().getId().equals(projectId));
+        if (!overwrite && !append && exits) {
+            // File exists but abort is selected
+            throw new InvalidSettingsException(
+                "A datasource with the name " + m_settings.getDatasourceName() + " exists in the configured project.");
+        }
+        if (append && !exits) {
+            // File doesn't exist but append is selected
+            throw new InvalidSettingsException("A datasource with the name " + m_settings.getDatasourceName()
+                + " doesn't exists in the configured project. The table can not be appended.");
+        }
     }
 
     private static String getProjectId(final ProjectListType projectsList, final String name) {

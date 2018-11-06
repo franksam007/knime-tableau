@@ -70,6 +70,7 @@ import org.apache.cxf.jaxrs.ext.multipart.ContentDisposition;
 import org.apache.cxf.jaxrs.ext.multipart.MultipartBody;
 import org.knime.core.node.CanceledExecutionException;
 import org.knime.core.node.ExecutionMonitor;
+import org.knime.ext.tableau.hyper.sendtable.api.binding.DataSourceListType;
 import org.knime.ext.tableau.hyper.sendtable.api.binding.DataSourceType;
 import org.knime.ext.tableau.hyper.sendtable.api.binding.ErrorType;
 import org.knime.ext.tableau.hyper.sendtable.api.binding.FileUploadType;
@@ -108,7 +109,9 @@ public class RestApiConnection {
 
     private static final String QUERY_PROJECTS = "sites/{siteId}/projects";
 
-    private static final String PUBLISH_DATASOURCE = "/sites/{site-id}/datasources";
+    private static final String QUERY_DATA_SOURCES = "sites/{siteId}/datasources";
+
+    private static final String PUBLISH_DATASOURCE = "sites/{siteId}/datasources";
 
     private static final String INITIATE_FILE_UPLOAD = "sites/{siteId}/fileUploads";
 
@@ -161,6 +164,19 @@ public class RestApiConnection {
         final String url = getUriBuilder().path(QUERY_PROJECTS).build(m_siteId).toString();
         final TsResponse response = get(url, m_token);
         return response.getProjects();
+    }
+
+    /**
+     * Queries the datasources of the connected tableau site.
+     *
+     * @return the list of datasources
+     * @throws TsResponseException if the server responds with an non successful response code
+     */
+    public DataSourceListType invokeQueryDatasources() throws TsResponseException {
+        checkSignedIn();
+        final String url = getUriBuilder().path(QUERY_DATA_SOURCES).build(m_siteId).toString();
+        final TsResponse response = get(url, m_token);
+        return response.getDatasources();
     }
 
     /**
