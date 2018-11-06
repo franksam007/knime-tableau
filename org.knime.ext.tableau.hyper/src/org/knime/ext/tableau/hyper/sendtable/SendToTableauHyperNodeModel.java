@@ -80,8 +80,6 @@ import org.knime.ext.tableau.hyper.sendtable.api.binding.ProjectType;
  */
 final class SendToTableauHyperNodeModel extends NodeModel {
 
-    // TODO change name?
-    // TODO make configurable?
     private static final String EXTRACT_TABLE_NAME = "Extract";
 
     private SendToTableauHyperSettings m_settings;
@@ -102,6 +100,7 @@ final class SendToTableauHyperNodeModel extends NodeModel {
         throws Exception {
         // Write table to a temporary hyper file
         final BufferedDataTable table = inData[0];
+        final ExecutionMonitor writeProgress = exec.createSubProgress(0.5);
         long rowIndex = 0L;
         final long rowCount = table.size();
 
@@ -121,8 +120,9 @@ final class SendToTableauHyperNodeModel extends NodeModel {
                 // Add rows to the table
                 for (final DataRow r : table) {
                     tableWriter.addRow(r);
-                    exec.setProgress((double)++rowIndex / rowCount,
+                    writeProgress.setProgress((double)++rowIndex / rowCount,
                         String.format("Row %d/%d (\"%s\")", rowIndex, rowCount, r.getKey().toString()));
+                    writeProgress.checkCanceled();
                 }
             } catch (final UnsatisfiedLinkError e) {
                 // TODO move somewhere else?
@@ -134,6 +134,7 @@ final class SendToTableauHyperNodeModel extends NodeModel {
         }
 
         // Send the file to the tableau server
+        final ExecutionMonitor sendProgress = exec.createSubProgress(0.5);
         final RestApiConnection restApi = new RestApiConnection(m_settings.getHost());
 
         // Sign in
@@ -143,8 +144,8 @@ final class SendToTableauHyperNodeModel extends NodeModel {
         final String projectId = getProjectId(projects, m_settings.getProjectName());
         final boolean overwrite = m_settings.getOverwrite() == FileOverwritePolicy.OVERWRITE;
         final boolean append = m_settings.getOverwrite() == FileOverwritePolicy.APPEND;
-        restApi.invokePublishDataSourceChunked(projectId, m_settings.getDatasourceName(), "hyper", f, overwrite,
-            append);
+        restApi.invokePublishDataSourceChunked(projectId, m_settings.getDatasourceName(), "hyper", f, overwrite, append,
+            sendProgress);
 
         // Return an empty array
         return new BufferedDataTable[]{};

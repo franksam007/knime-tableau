@@ -68,6 +68,8 @@ import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.multipart.AttachmentBuilder;
 import org.apache.cxf.jaxrs.ext.multipart.ContentDisposition;
 import org.apache.cxf.jaxrs.ext.multipart.MultipartBody;
+import org.knime.core.node.CanceledExecutionException;
+import org.knime.core.node.ExecutionMonitor;
 import org.knime.ext.tableau.hyper.sendtable.api.binding.DataSourceType;
 import org.knime.ext.tableau.hyper.sendtable.api.binding.ErrorType;
 import org.knime.ext.tableau.hyper.sendtable.api.binding.FileUploadType;
@@ -93,6 +95,7 @@ import org.knime.ext.tableau.hyper.sendtable.api.binding.TsResponse;
  */
 public class RestApiConnection {
 
+    /** 100KB per chunk (as in the example) */
     private static final int UPLOAD_CHUNK_SIZE = 100000;
 
     private static final String API_VERSION = "3.1";
@@ -169,23 +172,30 @@ public class RestApiConnection {
      * @param dataSource the datasource file
      * @param overwrite if the datasource should be overwritten if it exists
      * @param append if the data should be appended to an existing datasource
+     * @param progress a {@link ExecutionMonitor} to keep track of the upload progress
      * @return the datasource response from the server
      * @throws IOException something goes wrong while reading the file
      * @throws TsResponseException if the server responds with an non successful response code
+     * @throws CanceledExecutionException if the execution was canceled
      */
     public DataSourceType invokePublishDataSourceChunked(final String projectId, final String datasourceName,
-        final String datasourceType, final File dataSource, final boolean overwrite, final boolean append)
-        throws IOException, TsResponseException {
+        final String datasourceType, final File dataSource, final boolean overwrite, final boolean append,
+        final ExecutionMonitor progress) throws IOException, TsResponseException, CanceledExecutionException {
         checkSignedIn();
 
         // Initiate the file upload
         final FileUploadType fileUpload = invokeInitiateFileUpload();
 
+        final double totalChunks = Math.ceil(1. * dataSource.length() / UPLOAD_CHUNK_SIZE);
         final byte[] buffer = new byte[UPLOAD_CHUNK_SIZE];
         int numReadBytes = 0;
-        try (FileInputStream inputStream = new FileInputStream(dataSource)) {
+        long uploadedChunks = 0;
+        try (final FileInputStream inputStream = new FileInputStream(dataSource)) {
+            progress.setProgress(0);
             while ((numReadBytes = inputStream.read(buffer)) != -1) {
                 invokeAppendFileUpload(fileUpload.getUploadSessionId(), datasourceName, buffer, numReadBytes);
+                progress.setProgress(++uploadedChunks / totalChunks);
+                progress.checkCanceled();
             }
         }
 
