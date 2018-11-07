@@ -121,7 +121,7 @@ final class SendToTableauHyperNodeDialogPane extends NodeDialogPane {
         bg.add(m_overwritePolicyAbortButton);
 
         // Project chooser button
-        m_chooseProjectButton = new JButton("Choose...");
+        m_chooseProjectButton = new JButton("Browse...");
         m_chooseProjectButton.addActionListener(a -> chooseProject());
 
         addTab("Tableau Server Settings", initPanel());

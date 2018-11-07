@@ -13,12 +13,13 @@
 		<intro>
 			<p>
 				Sends the input data to a Tableau Server. The node uses the
-				Tableau
-				Extract API 2.0 to generate a hyper
-				file and, secondly, send
-				that hyper file as a datasource to the Tableau
-				Server via the Tableau
-				REST API.
+				Tableau Extract API 2.0 to generate a hyper file and, secondly, send
+				that hyper file as a datasource to the Tableau Server via the
+				Tableau REST API.
+			</p>
+			<p>
+				Uses version 2.8 of the Tableau Server REST API. Therefore the
+				minimum Tableau server version is 10.5.
 			</p>
 		</intro>
 		<tab name="Main Configuration">
@@ -32,8 +33,8 @@
 			<option name="SiteID">The site URL. Pass an empty string to connect to
 				the default site.
 			</option>
-			<option name="Project Name">The name of the project to publish the extract
-				to.
+			<option name="Project">The id of the project to publish the extract
+				to. Choose a project by pressing the "Browse..." button.
 			</option>
 			<option name="Data Source">The name of the data source to create on the
 				server.
