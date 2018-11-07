@@ -99,7 +99,7 @@ public class RestApiConnection {
     /** 100KB per chunk (as in the example) */
     private static final int UPLOAD_CHUNK_SIZE = 100000;
 
-    private static final String API_VERSION = "3.1";
+    private static final String API_VERSION = "2.8";
 
     private static final ObjectFactory OBJECT_FACTORY = new ObjectFactory();
 
@@ -146,7 +146,7 @@ public class RestApiConnection {
         throws TsResponseException {
         final String url = getUriBuilder().path(SIGN_IN).build().toString();
         final TsRequest payload = createPayloadForSignin(username, password, contentUrl);
-        TsResponse response = post(url, null, payload);
+        final TsResponse response = post(url, null, payload);
         final TableauCredentialsType credentials = response.getCredentials();
         m_token = credentials.getToken();
         m_siteId = credentials.getSite().getId();
@@ -291,7 +291,6 @@ public class RestApiConnection {
     }
 
     private UriBuilder getUriBuilder() {
-        // TODO support multiple API versions?
         return UriBuilder.fromPath(m_url + "/api/" + API_VERSION);
     }
 

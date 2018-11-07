@@ -74,8 +74,6 @@ import org.knime.ext.tableau.hyper.sendtable.SendToTableauHyperSettings.FileOver
 import org.knime.ext.tableau.hyper.sendtable.api.RestApiConnection;
 import org.knime.ext.tableau.hyper.sendtable.api.RestApiConnection.TsResponseException;
 import org.knime.ext.tableau.hyper.sendtable.api.binding.DataSourceListType;
-import org.knime.ext.tableau.hyper.sendtable.api.binding.ProjectListType;
-import org.knime.ext.tableau.hyper.sendtable.api.binding.ProjectType;
 
 /**
  * @author Benjamin Wilhelm, KNIME GmbH, Konstanz, Germany
@@ -141,11 +139,10 @@ final class SendToTableauHyperNodeModel extends NodeModel {
 
         // Sign in
         signIn(restApi);
-        final String projectId = findProjectId(restApi);
         final boolean overwrite = m_settings.getOverwrite() == FileOverwritePolicy.OVERWRITE;
         final boolean append = m_settings.getOverwrite() == FileOverwritePolicy.APPEND;
-        checkOverwriteAppend(restApi, projectId, overwrite, append);
-        restApi.invokePublishDataSourceChunked(projectId, m_settings.getDatasourceName(), "hyper", f, overwrite, append,
+        checkOverwriteAppend(restApi, m_settings.getProjectId(), overwrite, append);
+        restApi.invokePublishDataSourceChunked(m_settings.getProjectId(), m_settings.getDatasourceName(), "hyper", f, overwrite, append,
             sendProgress);
 
         // Return an empty array
@@ -154,12 +151,6 @@ final class SendToTableauHyperNodeModel extends NodeModel {
 
     private void signIn(final RestApiConnection restApi) throws TsResponseException {
         restApi.invokeSignIn(m_settings.getUsername(), m_settings.getPassword(), m_settings.getSiteContentURL());
-    }
-
-    private String findProjectId(final RestApiConnection restApi) throws TsResponseException {
-        final ProjectListType projects = restApi.invokeQueryProjects();
-        // TODO support projects with same name in different parent projects
-        return getProjectId(projects, m_settings.getProjectName());
     }
 
     private void checkOverwriteAppend(final RestApiConnection restApi, final String projectId, final boolean overwrite,
@@ -181,15 +172,6 @@ final class SendToTableauHyperNodeModel extends NodeModel {
         }
     }
 
-    private static String getProjectId(final ProjectListType projectsList, final String name) {
-        for (final ProjectType p : projectsList.getProject()) {
-            if (p.getName().equals(name)) {
-                return p.getId();
-            }
-        }
-        throw new IllegalArgumentException("There is no project with the name '" + name + "'.");
-    }
-
     @Override
     protected void reset() {
         // nothing to do
@@ -197,12 +179,12 @@ final class SendToTableauHyperNodeModel extends NodeModel {
 
     @Override
     protected void validateSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
-        new SendToTableauHyperSettings().loadSettingsInDialog(settings);
+        new SendToTableauHyperSettings().loadSettingsInModel(settings);
     }
 
     @Override
     protected void loadValidatedSettingsFrom(final NodeSettingsRO settings) throws InvalidSettingsException {
-        m_settings = new SendToTableauHyperSettings().loadSettingsInDialog(settings);
+        m_settings = new SendToTableauHyperSettings().loadSettingsInModel(settings);
     }
 
     @Override

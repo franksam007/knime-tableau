@@ -67,6 +67,8 @@ final class SendToTableauHyperSettings {
 
     private static final String CFG_DATASOURCE_NAME = "datasourceName";
 
+    private static final String CFG_PROJECT_ID = "projectId";
+
     private static final String CFG_PROJECT_NAME = "projectName";
 
     private static final String CFG_SITE_CONTENT_URL = "siteContentURL";
@@ -84,6 +86,8 @@ final class SendToTableauHyperSettings {
     private String m_password;
 
     private String m_siteContentURL;
+
+    private String m_projectId;
 
     private String m_projectName;
 
@@ -135,6 +139,14 @@ final class SendToTableauHyperSettings {
         m_siteContentURL = siteID;
     }
 
+    String getProjectId() {
+        return m_projectId;
+    }
+
+    void setProjectId(final String projectId) {
+        m_projectId = projectId;
+    }
+
     String getProjectName() {
         return m_projectName;
     }
@@ -165,6 +177,7 @@ final class SendToTableauHyperSettings {
         settings.addPassword(CFG_PASSWORD, PASSWORD_ENC, m_password);
         settings.addString(CFG_SITE_CONTENT_URL, m_siteContentURL);
 
+        settings.addString(CFG_PROJECT_ID, m_projectId);
         settings.addString(CFG_PROJECT_NAME, m_projectName);
         settings.addString(CFG_DATASOURCE_NAME, m_datasourceName);
         settings.addString(CFG_OVERWRITE, m_overwrite.toString());
@@ -176,6 +189,7 @@ final class SendToTableauHyperSettings {
         m_password = settings.getPassword(CFG_PASSWORD, PASSWORD_ENC, "");
         m_siteContentURL = settings.getString(CFG_SITE_CONTENT_URL, "");
 
+        m_projectId = settings.getString(CFG_PROJECT_ID, "");
         m_projectName = settings.getString(CFG_PROJECT_NAME, "");
         m_datasourceName = settings.getString(CFG_DATASOURCE_NAME, "");
         m_overwrite =
@@ -194,6 +208,9 @@ final class SendToTableauHyperSettings {
 
         m_siteContentURL = settings.getString(CFG_SITE_CONTENT_URL);
         // Site content URL can be empty: For the default site
+
+        m_projectId = settings.getString(CFG_PROJECT_ID);
+        CheckUtils.checkSetting(StringUtils.isNotEmpty(m_projectId), "Project id must not be empty");
 
         m_projectName = settings.getString(CFG_PROJECT_NAME);
         CheckUtils.checkSetting(StringUtils.isNotEmpty(m_projectName), "Project name must not be empty");

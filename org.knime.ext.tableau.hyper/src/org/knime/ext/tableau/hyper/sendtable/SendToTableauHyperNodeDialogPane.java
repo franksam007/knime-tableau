@@ -47,6 +47,8 @@
 package org.knime.ext.tableau.hyper.sendtable;
 
 import java.awt.Component;
+import java.awt.Container;
+import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -54,11 +56,13 @@ import java.awt.Insets;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
+import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JRadioButton;
 import javax.swing.JSeparator;
+import javax.swing.JTextField;
 
 import org.knime.core.data.DataTableSpec;
 import org.knime.core.node.InvalidSettingsException;
@@ -82,7 +86,9 @@ final class SendToTableauHyperNodeDialogPane extends NodeDialogPane {
 
     private final StringHistoryPanel m_siteContentURLPanel;
 
-    private final StringHistoryPanel m_projectNamePanel;
+    private final JButton m_chooseProjectButton;
+
+    private final JTextField m_projectNamePanel;
 
     private final StringHistoryPanel m_datasourceNamePanel;
 
@@ -92,12 +98,17 @@ final class SendToTableauHyperNodeDialogPane extends NodeDialogPane {
 
     private final JRadioButton m_overwritePolicyOverwriteButton;
 
+    private String m_projectId;
+
+    private String m_projectName;
+
     SendToTableauHyperNodeDialogPane() {
         m_hostPanel = new StringHistoryPanel("send-to-tableau-host");
         m_usernamePanel = new StringHistoryPanel("send-to-tableau-username");
         m_passwordField = new JPasswordField();
         m_siteContentURLPanel = new StringHistoryPanel("send-to-tableau-siteContentURL");
-        m_projectNamePanel = new StringHistoryPanel("send-to-tableau-projectName");
+        m_projectNamePanel = new JTextField("");
+        m_projectNamePanel.setEditable(false);
         m_datasourceNamePanel = new StringHistoryPanel("send-to-tableau-datasourceName");
 
         // Overwrite policy buttons
@@ -109,7 +120,42 @@ final class SendToTableauHyperNodeDialogPane extends NodeDialogPane {
         bg.add(m_overwritePolicyOverwriteButton);
         bg.add(m_overwritePolicyAbortButton);
 
+        // Project chooser button
+        m_chooseProjectButton = new JButton("Choose...");
+        m_chooseProjectButton.addActionListener(a -> chooseProject());
+
         addTab("Tableau Server Settings", initPanel());
+    }
+
+    private void chooseProject() {
+        final ProjectChooserPanel projectChooser = new ProjectChooserPanel(findParentFrame(), this::setProject);
+        projectChooser.invokeLoadingProjects(m_hostPanel.getSelectedString(), m_usernamePanel.getSelectedString(),
+            String.valueOf(m_passwordField.getPassword()), m_siteContentURLPanel.getSelectedString());
+    }
+
+    private void updateProjectTextField() {
+        if (m_projectId != null && !m_projectId.isEmpty()) {
+            m_projectNamePanel.setText(m_projectName + " (" + m_projectId + ")");
+        } else {
+            m_projectNamePanel.setText("");
+        }
+    }
+
+    private void setProject(final String id, final String name) {
+        m_projectId = id;
+        m_projectName = name;
+        updateProjectTextField();
+    }
+
+    private Frame findParentFrame() {
+        Container container = getPanel();
+        while (container != null) {
+            if (container instanceof Frame) {
+                return (Frame)container;
+            }
+            container = container.getParent();
+        }
+        return null;
     }
 
     private JPanel initPanel() {
@@ -144,15 +190,19 @@ final class SendToTableauHyperNodeDialogPane extends NodeDialogPane {
         gbc.gridy += 1;
 
         gbc.gridx = 0;
-        gbc.gridwidth = 2;
+        gbc.gridwidth = 3;
         p.add(new JSeparator(), gbc);
         gbc.gridy += 1;
 
         gbc.gridwidth = 1;
         gbc.gridx = 0;
-        p.add(new JLabel("Project Name "), gbcLabel(gbc));
+        p.add(new JLabel("Project"), gbcLabel(gbc));
         gbc.gridx += 1;
-        p.add(m_projectNamePanel, gbcComponent(gbc));
+        gbcComponent(gbc);
+        gbc.gridwidth = 1;
+        p.add(m_projectNamePanel, gbc);
+        gbc.gridx += 1;
+        p.add(m_chooseProjectButton, gbc);
         gbc.gridy += 1;
 
         gbc.gridx = 0;
@@ -187,6 +237,7 @@ final class SendToTableauHyperNodeDialogPane extends NodeDialogPane {
     private static GridBagConstraints gbcLabel(final GridBagConstraints gbc) {
         gbc.anchor = GridBagConstraints.EAST;
         gbc.fill = GridBagConstraints.NONE;
+        gbc.gridwidth = 1;
         gbc.weightx = 0.0;
         return gbc;
     }
@@ -195,6 +246,7 @@ final class SendToTableauHyperNodeDialogPane extends NodeDialogPane {
         gbc.anchor = GridBagConstraints.WEST;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.weightx = 1.0;
+        gbc.gridwidth = 2;
         return gbc;
     }
 
@@ -206,7 +258,9 @@ final class SendToTableauHyperNodeDialogPane extends NodeDialogPane {
         m_passwordField.setText(s.getPassword());
         m_siteContentURLPanel.setSelectedString(s.getSiteContentURL());
 
-        m_projectNamePanel.setSelectedString(s.getProjectName());
+        m_projectId = s.getProjectId();
+        m_projectName = s.getProjectName();
+        updateProjectTextField();
         m_datasourceNamePanel.setSelectedString(s.getDatasourceName());
         switch (s.getOverwrite()) {
             case APPEND:
@@ -229,7 +283,8 @@ final class SendToTableauHyperNodeDialogPane extends NodeDialogPane {
         s.setPassword(new String(m_passwordField.getPassword()));
         s.setSiteContentURL(m_siteContentURLPanel.getSelectedString());
 
-        s.setProjectName(m_projectNamePanel.getSelectedString());
+        s.setProjectId(m_projectId);
+        s.setProjectName(m_projectName);
         s.setDatasourceName(m_datasourceNamePanel.getSelectedString());
         // Save the overwrite policy
         if (m_overwritePolicyAppendButton.isSelected()) {
