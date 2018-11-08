@@ -50,10 +50,7 @@ import org.knime.core.node.NodeDialogPane;
 import org.knime.core.node.NodeFactory;
 import org.knime.core.node.NodeView;
 
-/**
- *
- * @author Benjamin Wilhelm, KNIME GmbH, Konstaz, Germany
- */
+/** @author Benjamin Wilhelm, KNIME GmbH, Konstaz, Germany */
 public final class SendToTableauHyperNodeFactory extends NodeFactory<SendToTableauHyperNodeModel> {
 
     @Override
@@ -67,7 +64,8 @@ public final class SendToTableauHyperNodeFactory extends NodeFactory<SendToTable
     }
 
     @Override
-    public NodeView<SendToTableauHyperNodeModel> createNodeView(final int viewIndex, final SendToTableauHyperNodeModel nodeModel) {
+    public NodeView<SendToTableauHyperNodeModel> createNodeView(final int viewIndex,
+        final SendToTableauHyperNodeModel nodeModel) {
         return null;
     }
 

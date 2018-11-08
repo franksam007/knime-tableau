@@ -45,7 +45,7 @@ package org.knime.ext.tableau.hyper.sendtable.api;
  * ---------------------------------------------------------------------
  *
  * History
- *   Oct 18, 2018 (bw): created
+ *   Oct 18, 2018 (Benjamin Wilhelm): created
  */
 
 import java.io.ByteArrayInputStream;
@@ -95,7 +95,7 @@ import org.knime.ext.tableau.hyper.sendtable.api.binding.TsResponse;
  *      - RestApiUtils.java</a>
  * @author Benjamin Wilhelm, KNIME GmbH, Konstanz, Germany
  */
-public class RestApiConnection {
+public final class RestApiConnection {
 
     /** 100KB per chunk (as in the example) */
     private static final int UPLOAD_CHUNK_SIZE = 100000;

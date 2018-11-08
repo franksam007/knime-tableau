@@ -44,7 +44,7 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   Nov 7, 2018 (bw): created
+ *   Nov 7, 2018 (Benjamin Wilhelm): created
  */
 package org.knime.ext.tableau.hyper.sendtable;
 
@@ -79,11 +79,8 @@ import org.knime.ext.tableau.hyper.sendtable.api.RestApiConnection.TsResponseExc
 import org.knime.ext.tableau.hyper.sendtable.api.binding.ProjectListType;
 import org.knime.ext.tableau.hyper.sendtable.api.binding.ProjectType;
 
-/**
- *
- * @author Benjamin Wilhelm, KNIME GmbH, Konstanz, Germany
- */
-public class ProjectChooserPanel {
+/** @author Benjamin Wilhelm, KNIME GmbH, Konstanz, Germany */
+final class ProjectChooserPanel {
 
     private static final NodeLogger LOGGER = NodeLogger.getLogger(ProjectChooserPanel.class);
 
@@ -108,7 +105,7 @@ public class ProjectChooserPanel {
      * @param selector a {@link BiConsumer} that is called with the id and name of the project when a project was
      *            selected
      */
-    public ProjectChooserPanel(final Frame parent, final BiConsumer<String, String> selector) {
+    ProjectChooserPanel(final Frame parent, final BiConsumer<String, String> selector) {
         m_selector = selector;
 
         m_tree = new JTree(new String[]{"Loading..."});
@@ -165,7 +162,7 @@ public class ProjectChooserPanel {
      * @param password
      * @param contentUrl
      */
-    public void invokeLoadingProjects(final String host, final String user, final String password,
+    void invokeLoadingProjects(final String host, final String user, final String password,
         final String contentUrl) {
         m_projectLoader = new ProjectLoader(host, user, password, contentUrl);
         m_projectLoader.execute();
@@ -220,7 +217,7 @@ public class ProjectChooserPanel {
 
         private String m_contentUrl;
 
-        public ProjectLoader(final String host, final String user, final String password, final String contentUrl) {
+        ProjectLoader(final String host, final String user, final String password, final String contentUrl) {
             m_host = host;
             m_user = user;
             m_password = password;
@@ -254,7 +251,7 @@ public class ProjectChooserPanel {
             // Get all projects
             final ProjectListType projects = apiConnection.invokeQueryProjects();
             final Queue<ProjectType> queue = new LinkedList<>(projects.getProject());
-            final List<String> readdedIds = new LinkedList<>();
+            final List<String> readIds = new LinkedList<>();
 
             final Map<String, DefaultMutableTreeNode> tree = new HashMap<>();
             final DefaultMutableTreeNode root = new DefaultMutableTreeNode("");
@@ -268,7 +265,7 @@ public class ProjectChooserPanel {
                         new DefaultMutableTreeNode(new ProjectDesc(p.getName(), p.getId()));
                     root.add(node);
                     tree.put(p.getId(), node);
-                    readdedIds.clear();
+                    readIds.clear();
                 } else if (tree.containsKey(parentId)) {
                     // We know about the parent
                     final DefaultMutableTreeNode node =
@@ -276,9 +273,9 @@ public class ProjectChooserPanel {
                     final DefaultMutableTreeNode parent = tree.get(parentId);
                     parent.add(node);
                     tree.put(p.getId(), node);
-                    readdedIds.clear();
+                    readIds.clear();
                 } else {
-                    if (readdedIds.contains(p.getId())) {
+                    if (readIds.contains(p.getId())) {
                         // We added no node to the tree since the last time we saw this node:
                         // Something is wrong
                         throw new IllegalStateException(
@@ -287,7 +284,7 @@ public class ProjectChooserPanel {
                     // We don't know where the parent is in the tree:
                     // Add it back to the queue
                     queue.add(p);
-                    readdedIds.add(p.getId());
+                    readIds.add(p.getId());
                 }
             }
             return root;

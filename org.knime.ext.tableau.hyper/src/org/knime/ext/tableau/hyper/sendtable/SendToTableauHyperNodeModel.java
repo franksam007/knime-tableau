@@ -75,9 +75,7 @@ import org.knime.ext.tableau.hyper.sendtable.api.RestApiConnection;
 import org.knime.ext.tableau.hyper.sendtable.api.RestApiConnection.TsResponseException;
 import org.knime.ext.tableau.hyper.sendtable.api.binding.DataSourceListType;
 
-/**
- * @author Benjamin Wilhelm, KNIME GmbH, Konstanz, Germany
- */
+/** @author Benjamin Wilhelm, KNIME GmbH, Konstanz, Germany */
 final class SendToTableauHyperNodeModel extends NodeModel {
 
     private static final String EXTRACT_TABLE_NAME = "Extract";
@@ -142,8 +140,8 @@ final class SendToTableauHyperNodeModel extends NodeModel {
         final boolean overwrite = m_settings.getOverwrite() == FileOverwritePolicy.OVERWRITE;
         final boolean append = m_settings.getOverwrite() == FileOverwritePolicy.APPEND;
         checkOverwriteAppend(restApi, m_settings.getProjectId(), overwrite, append);
-        restApi.invokePublishDataSourceChunked(m_settings.getProjectId(), m_settings.getDatasourceName(), "hyper", f, overwrite, append,
-            sendProgress);
+        restApi.invokePublishDataSourceChunked(m_settings.getProjectId(), m_settings.getDatasourceName(), "hyper", f,
+            overwrite, append, sendProgress);
 
         // Return an empty array
         return new BufferedDataTable[]{};

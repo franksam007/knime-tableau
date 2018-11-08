@@ -55,7 +55,6 @@ import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.util.CheckUtils;
 
 /**
- *
  * @author wiswedel
  * @author Benjamin Wilhelm, KNIME GmbH, Konstanz, Germany
  */
