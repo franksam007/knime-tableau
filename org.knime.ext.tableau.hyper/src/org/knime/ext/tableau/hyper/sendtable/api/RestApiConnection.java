@@ -86,8 +86,9 @@ import org.knime.ext.tableau.hyper.sendtable.api.binding.TsResponse;
  * A {@link RestApiConnection} represents a connection to the REST API of a tableau server. The connection can execute
  * requests to the tableau server and handles the authentication.
  *
- * This implementation is strongly adapted from the class RestAPIUtils from the tableau example
- * (<a href="https://github.com/tableau/rest-api-samples/blob/master/LICENSE">MIT LICENSE</a>)
+ * This implementation is inspired by the class <a href=
+ * "https://github.com/tableau/rest-api-samples/blob/master/java/src/com/tableausoftware/documentation/api/rest/util/RestApiUtils.java">RestApiUtils</a>
+ * from the tableau example.
  *
  * @see <a href=
  *      "https://github.com/tableau/rest-api-samples/blob/master/java/src/com/tableausoftware/documentation/api/rest/util/RestApiUtils.java">GitHub.com
@@ -145,7 +146,20 @@ public class RestApiConnection {
     public synchronized void invokeSignIn(final String username, final String password, final String contentUrl)
         throws TsResponseException {
         final String url = getUriBuilder().path(SIGN_IN).build().toString();
-        final TsRequest payload = createPayloadForSignin(username, password, contentUrl);
+
+        // Create the sign in credentials payload
+        final TableauCredentialsType credentialsSignIn = OBJECT_FACTORY.createTableauCredentialsType();
+        credentialsSignIn.setName(username);
+        credentialsSignIn.setPassword(password);
+        final SiteType site = OBJECT_FACTORY.createSiteType();
+        site.setContentUrl(contentUrl);
+        credentialsSignIn.setSite(site);
+
+        // Create a ts request
+        final TsRequest payload = OBJECT_FACTORY.createTsRequest();
+        payload.setCredentials(credentialsSignIn);
+
+        // Execute the post
         final TsResponse response = post(url, null, payload);
         final TableauCredentialsType credentials = response.getCredentials();
         m_token = credentials.getToken();
@@ -281,11 +295,25 @@ public class RestApiConnection {
             .queryParam("overwrite", overwrite) //
             .queryParam("append", append) //
             .build(m_siteId).toString();
+
+        // Create a datasource payload
+        final ProjectType project = OBJECT_FACTORY.createProjectType();
+        project.setId(projectId);
+        final DataSourceType dataSource = OBJECT_FACTORY.createDataSourceType();
+        dataSource.setName(datasourceName);
+        dataSource.setProject(project);
+
+        // Create a ts request
+        final TsRequest payload = OBJECT_FACTORY.createTsRequest();
+        payload.setDatasource(dataSource);
+
+        // Create the attachment
         final List<Attachment> atts = new LinkedList<>();
-        final TsRequest payload = createPayloadToPublishDatasource(datasourceName, projectId);
         final ContentDisposition cdBody = new ContentDisposition("name=\"request_payload\"");
         atts.add(new AttachmentBuilder().id("request_payload").mediaType(MediaType.TEXT_XML).contentDisposition(cdBody)
             .object(payload).build());
+
+        // Execute the post
         final TsResponse response = postMultipart(url, m_token, atts);
         return response.getDatasource();
     }
@@ -294,7 +322,7 @@ public class RestApiConnection {
         return UriBuilder.fromPath(m_url + "/api/" + API_VERSION);
     }
 
-    private void checkSignedIn() {
+    private synchronized void checkSignedIn() {
         if (!m_signedIn) {
             throw new IllegalStateException(
                 "Invoke login before communication with the server. This is a coding error.");
@@ -374,74 +402,5 @@ public class RestApiConnection {
         private TsResponseException(final String message, final Exception cause) {
             super(message, cause);
         }
-    }
-
-    // =========================================================================================================================
-    // COPIED FROM:
-    // https://github.com/tableau/rest-api-samples/blob/master/java/src/com/tableausoftware/documentation/api/rest/util/RestApiUtils.java
-    // LICENSE: MIT
-    // =========================================================================================================================
-
-    /**
-     * Creates the request payload used to sign in to the server.
-     *
-     * @param username the username of the user to authenticate
-     * @param password the password of the user to authenticate
-     * @param contentUrl the content URL for the site to authenticate to
-     * @return the request payload
-     */
-    private static TsRequest createPayloadForSignin(final String username, final String password,
-        final String contentUrl) {
-        // Creates the parent tsRequest element
-        TsRequest requestPayload = OBJECT_FACTORY.createTsRequest();
-
-        // Creates the credentials element and site element
-        TableauCredentialsType signInCredentials = OBJECT_FACTORY.createTableauCredentialsType();
-        SiteType site = OBJECT_FACTORY.createSiteType();
-
-        // Sets the content URL of the site to sign in to
-        site.setContentUrl(contentUrl);
-        signInCredentials.setSite(site);
-
-        // Sets the name and password of the user to authenticate
-        signInCredentials.setName(username);
-        signInCredentials.setPassword(password);
-
-        // Adds the credential element to the request payload
-        requestPayload.setCredentials(signInCredentials);
-
-        return requestPayload;
-    }
-
-    /**
-     * Creates the request payload used to publish a datasource.
-     *
-     * @param datasourceName the name for the new datasource
-     * @param projectId the ID of the project to publish to
-     * @return the request payload
-     */
-    private static TsRequest createPayloadToPublishDatasource(final String datasourceName, final String projectId) {
-        // Creates the parent tsRequest element
-        TsRequest requestPayload = OBJECT_FACTORY.createTsRequest();
-
-        // Creates the datasource element
-        DataSourceType dataSource = OBJECT_FACTORY.createDataSourceType();
-
-        // Creates the project element
-        ProjectType project = OBJECT_FACTORY.createProjectType();
-
-        // Sets the target project ID
-        project.setId(projectId);
-
-        // Sets the data source name
-        dataSource.setName(datasourceName);
-
-        // Sets the project
-        dataSource.setProject(project);
-
-        // Adds the workbook element to the request payload
-        requestPayload.setDatasource(dataSource);
-
-        return requestPayload;
     }
 }
