@@ -68,6 +68,7 @@ import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.multipart.AttachmentBuilder;
 import org.apache.cxf.jaxrs.ext.multipart.ContentDisposition;
 import org.apache.cxf.jaxrs.ext.multipart.MultipartBody;
+import org.apache.cxf.transport.http.HTTPConduit;
 import org.knime.core.node.CanceledExecutionException;
 import org.knime.core.node.ExecutionMonitor;
 import org.knime.ext.tableau.hyper.sendtable.api.binding.DataSourceListType;
@@ -97,6 +98,12 @@ import org.knime.ext.tableau.hyper.sendtable.api.binding.TsResponse;
  */
 public final class RestApiConnection {
 
+    /** 30 seconds */
+    private static final long DEFAULT_CONNECTION_TIMEOUT = 30000;
+
+    /** 60 seconds */
+    private static final long DEFAULT_RECEIVE_TIMEOUT = 60000;
+
     /** 100KB per chunk (as in the example) */
     private static final int UPLOAD_CHUNK_SIZE = 100000;
 
@@ -120,6 +127,10 @@ public final class RestApiConnection {
 
     private final String m_url;
 
+    private final long m_connectionTimeout;
+
+    private final long m_receiveTimeout;
+
     private boolean m_signedIn = false;
 
     private String m_token;
@@ -133,6 +144,21 @@ public final class RestApiConnection {
      */
     public RestApiConnection(final String url) {
         m_url = url;
+        m_connectionTimeout = DEFAULT_CONNECTION_TIMEOUT;
+        m_receiveTimeout = DEFAULT_RECEIVE_TIMEOUT;
+    }
+
+    /**
+     * Creates a new connection to the tableau server with the given url.
+     *
+     * @param url the url to the server
+     * @param connectionTimeout timeout for establishing the connection in milliseconds
+     * @param receiveTimeout timeout for receiving responses in milliseconds
+     */
+    public RestApiConnection(final String url, final long connectionTimeout, final long receiveTimeout) {
+        m_url = url;
+        m_connectionTimeout = connectionTimeout;
+        m_receiveTimeout = receiveTimeout;
     }
 
     /**
@@ -160,7 +186,7 @@ public final class RestApiConnection {
         payload.setCredentials(credentialsSignIn);
 
         // Execute the post
-        final TsResponse response = post(url, null, payload);
+        final TsResponse response = post(url, payload);
         final TableauCredentialsType credentials = response.getCredentials();
         m_token = credentials.getToken();
         m_siteId = credentials.getSite().getId();
@@ -176,7 +202,7 @@ public final class RestApiConnection {
     public ProjectListType invokeQueryProjects() throws TsResponseException {
         checkSignedIn();
         final String url = getUriBuilder().path(QUERY_PROJECTS).build(m_siteId).toString();
-        final TsResponse response = get(url, m_token);
+        final TsResponse response = get(url);
         return response.getProjects();
     }
 
@@ -189,7 +215,7 @@ public final class RestApiConnection {
     public DataSourceListType invokeQueryDatasources() throws TsResponseException {
         checkSignedIn();
         final String url = getUriBuilder().path(QUERY_DATA_SOURCES).build(m_siteId).toString();
-        final TsResponse response = get(url, m_token);
+        final TsResponse response = get(url);
         return response.getDatasources();
     }
 
@@ -244,7 +270,7 @@ public final class RestApiConnection {
     private FileUploadType invokeInitiateFileUpload() throws TsResponseException {
         checkSignedIn();
         final String url = getUriBuilder().path(INITIATE_FILE_UPLOAD).build(m_siteId).toString();
-        final TsResponse response = post(url, m_token, null);
+        final TsResponse response = post(url, null);
         return response.getFileUpload();
     }
 
@@ -280,7 +306,7 @@ public final class RestApiConnection {
             final ContentDisposition cd =
                 new ContentDisposition("name=\"tableau_file\"; filename=\"" + fileName + "\"");
             atts.add(new Attachment("tableau_datasource", inputStream, cd));
-            final TsResponse response = putMultipart(url, m_token, atts);
+            final TsResponse response = putMultipart(url, atts);
             return response.getFileUpload();
         }
     }
@@ -314,7 +340,7 @@ public final class RestApiConnection {
             .object(payload).build());
 
         // Execute the post
-        final TsResponse response = postMultipart(url, m_token, atts);
+        final TsResponse response = postMultipart(url, atts);
         return response.getDatasource();
     }
 
@@ -329,25 +355,30 @@ public final class RestApiConnection {
         }
     }
 
-    private static WebClient getClient(final String url, final String token) {
+    private WebClient getClient(final String url) {
         final WebClient client = WebClient.create(url);
-        if (token != null) {
-            client.header(TABLEAU_AUTH_HEADER, token);
+
+        // Set the timeout
+        final HTTPConduit httpConduit = WebClient.getConfig(client).getHttpConduit();
+        httpConduit.getClient().setConnectionTimeout(m_connectionTimeout);
+        httpConduit.getClient().setReceiveTimeout(m_receiveTimeout);
+
+        // Set the auth token if signed in
+        if (m_signedIn) {
+            client.header(TABLEAU_AUTH_HEADER, m_token);
         }
         return client;
     }
 
-    private static TsResponse post(final String url, final String token, final TsRequest requestPayload)
-        throws TsResponseException {
-        final WebClient client = getClient(url, token);
+    private TsResponse post(final String url, final TsRequest requestPayload) throws TsResponseException {
+        final WebClient client = getClient(url);
         client.accept(MediaType.APPLICATION_XML);
         final Response response = client.post(requestPayload);
         return checkResponse(response);
     }
 
-    private static TsResponse postMultipart(final String url, final String token, final List<Attachment> attachments)
-        throws TsResponseException {
-        final WebClient client = getClient(url, token);
+    private TsResponse postMultipart(final String url, final List<Attachment> attachments) throws TsResponseException {
+        final WebClient client = getClient(url);
         client.accept(MediaType.APPLICATION_XML);
         client.encoding("UTF-8");
         client.type("multipart/mixed");
@@ -355,9 +386,8 @@ public final class RestApiConnection {
         return checkResponse(response);
     }
 
-    private static TsResponse putMultipart(final String url, final String token, final List<Attachment> attachments)
-        throws TsResponseException {
-        final WebClient client = getClient(url, token);
+    private TsResponse putMultipart(final String url, final List<Attachment> attachments) throws TsResponseException {
+        final WebClient client = getClient(url);
         client.accept(MediaType.APPLICATION_XML);
         client.encoding("UTF-8");
         client.type("multipart/mixed");
@@ -365,8 +395,8 @@ public final class RestApiConnection {
         return checkResponse(response);
     }
 
-    private static TsResponse get(final String url, final String token) throws TsResponseException {
-        final WebClient client = getClient(url, token);
+    private TsResponse get(final String url) throws TsResponseException {
+        final WebClient client = getClient(url);
         client.accept(MediaType.APPLICATION_XML);
         final Response response = client.get();
         return checkResponse(response);
