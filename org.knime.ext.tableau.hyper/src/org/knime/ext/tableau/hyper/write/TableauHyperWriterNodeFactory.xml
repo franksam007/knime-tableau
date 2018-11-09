@@ -10,9 +10,11 @@
         <intro>
         	<p>Writes the input table as Tableau Data Extract (Hyper) file. This node uses the Tableau SDK library to
         	   write the file.</p>
-        	<p>In order to use this library the user needs to perform the installation steps as described on the 
-        	Tableau SDK website (see below).
-        	</p>
+        	<p>
+				In order to use this library the user needs to perform the
+				installation steps as described on the
+				<a href="https://www.knime.com/reporting/tableau">Tableau Integration page.</a>
+			</p>
        	</intro>
        	<tab name="Main Configuration">
             <option name="Output Location">Choose the file to write to.</option>
@@ -20,20 +22,18 @@
        	</tab>
         <!-- This is copied in the tableau server writer node. -->
        	<tab name="Installation">
-           	<option name="">
-               	<ol>
-               	   <li>Download the Java version of the <a href="https://onlinehelp.tableau.com/current/api/extract_api/en-us/help.htm#Extract/extract_api_installing.htm%3FTocPath%3D_____3">
-                    Tableau Extract API 2.0</a> for your system (Windows, Mac, or Linux).</li>
-               	   <li>Extract the archive to a location of your choice.</li>
-               	   <li>Update environment variables such as PATH on your system (see point 4
-               	       <a href="https://onlinehelp.tableau.com/current/api/extract_api/en-us/help.htm#Extract/extract_api_using_java_eclipse.htm%3FTocPath%3D_____5">
-                          here</a>). If you are not familiar with setting variables on Windows, have a look at 
-                          <a href="http://www.computerhope.com/issues/ch000549.htm">this page</a>.</li>
-                   <li>On Windows systems: The library relies on the "Visual C++ Redistributable Packages for Visual Studio 2013" to be installed on the
-                       system (for download from <a href="https://www.microsoft.com/en-US/download/details.aspx?id=40784">
-                       microsoft.com</a>)</li>
-               	</ol>
-           	</option>
+  			<option name="">
+				<ol>
+					<li>
+						Open the Tableau Preferences page and select
+						<b>Tableau Hyper</b>
+					</li>
+					<li>When prompted restart KNIME Analytics Platform</li>
+					<li>Depending on your operating system, you need to perform
+						additional installation steps, described in the preferences page.
+					</li>
+				</ol>
+			</option>
        	</tab>
     </fullDescription>
     <ports>

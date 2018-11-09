@@ -58,6 +58,7 @@ import org.knime.core.node.CanceledExecutionException;
 import org.knime.core.node.ExecutionContext;
 import org.knime.core.node.ExecutionMonitor;
 import org.knime.core.node.InvalidSettingsException;
+import org.knime.core.node.NodeLogger;
 import org.knime.core.node.NodeModel;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
@@ -79,6 +80,10 @@ import org.knime.ext.tableau.extractwrite.TableauExtractSettings.FileOverwritePo
 public final class TableauExtractNodeModel extends NodeModel {
 
     private static final String EXTRACT_TABLE_NAME = "Extract";
+
+    private static final Object libararyLock = new Object();
+
+    private static final NodeLogger LOG = NodeLogger.getLogger(TableauExtractNodeModel.class);
 
     private final TableauExtractAPI m_extractAPI;
 
@@ -128,8 +133,15 @@ public final class TableauExtractNodeModel extends NodeModel {
                     "Output file \"%s\" already exists - must not overwrite as per user setting", f.getAbsolutePath()));
             }
         }
-        synchronized (m_extractAPI.getClass()) {
-            m_extractAPI.initialize();
+        synchronized (libararyLock) {
+            try {
+                m_extractAPI.initialize();
+            } catch (Throwable e) {
+                LOG.debug(e);
+                throw new InvalidSettingsException(
+                    "Unable to initialize Tableau backend '" + m_extractAPI.getSDKType().toString()
+                        + "', please follow the installation instructions in the node description.");
+            }
             try (final TableauExtract tableauExtract = m_extractCreator.openExtract(f.getAbsolutePath())) {
                 TableauTable tableWriter = null;
                 if (m_settings.getFileOverwritePolicy() == FileOverwritePolicy.Append) {
@@ -148,10 +160,6 @@ public final class TableauExtractNodeModel extends NodeModel {
                     exec.setProgress((double)++rowIndex / rowCount,
                         String.format("Row %d/%d (\"%s\")", rowIndex, rowCount, r.getKey().toString()));
                 }
-            } catch (final UnsatisfiedLinkError e) {
-                // TODO move somewhere else?
-                throw new Exception(e.getMessage() + " (follow \"Installation\" steps described in node description)",
-                    e);
             } finally {
                 m_extractAPI.cleanup();
             }
