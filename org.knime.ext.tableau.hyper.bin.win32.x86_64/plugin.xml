@@ -1,4 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <?eclipse version="3.2"?>
 <plugin>
+   <extension
+         point="org.knime.ext.tableau.hyper">
+      <libFolder
+            name="libFolder"
+            path="extractapi-x64-2018-2-3/bin/">
+      </libFolder>
+   </extension>
 </plugin>
