@@ -12,4 +12,9 @@
             factory-class="org.knime.ext.tableau.hyper.sendtable.SendToTableauHyperNodeFactory">
       </node>
    </extension>
+   <extension point="org.knime.ext.tableau.installdir">
+	  <InstallDir
+          InstallDirProvider="org.knime.ext.tableau.hyper.TableauHyperInstallDirProvider">
+       </InstallDir>
+   </extension>
 </plugin>

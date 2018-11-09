@@ -44,52 +44,37 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   Oct 5, 2018 (bw): created
+ *   Nov 7, 2018 (gabriel): created
  */
 package org.knime.ext.tableau.hyper;
 
-import org.knime.ext.tableau.TableauExtractAPI;
 import org.knime.ext.tableau.TableauPlugin.TABLEAU_SDK;
-import org.knime.ext.tableau.WrappingTableauException;
-
-import com.tableausoftware.TableauException;
-import com.tableausoftware.hyperextract.ExtractAPI;
+import org.knime.ext.tableau.preferences.TableauInstallDirProvider;
 
 /**
  *
- * @author Benjamin Wilhelm, KNIME GmbH, Konstanz, Germany
+ * @author Gabriel Einsdorf
  */
-public class TableauHyperExtractAPI implements TableauExtractAPI {
+public class TableauHyperInstallDirProvider implements TableauInstallDirProvider {
+
+    // injected by activator
+    private static String installDir = "";
 
     @Override
-    public Class<?> getExtractAPIClass() {
-        return ExtractAPI.class;
+    public String installationDir() {
+        return installDir;
     }
 
     @Override
-    public void initialize() throws WrappingTableauException {
-        try {
-            ExtractAPI.initialize();
-        } catch (final TableauException e) {
-            throw new WrappingTableauException(e);
-        }
-    }
-
-    @Override
-    public void cleanup() throws WrappingTableauException {
-        try {
-            ExtractAPI.cleanup();
-        } catch (final TableauException e) {
-            throw new WrappingTableauException(e);
-        }
+    public TABLEAU_SDK backend() {
+        return TABLEAU_SDK.HYPER;
     }
 
     /**
-     * {@inheritDoc}
+     * @param createLibraryPath
      */
-    @Override
-    public TABLEAU_SDK getSDKType() {
-        return TABLEAU_SDK.HYPER;
+    static void setInstallDir(final String directory) {
+        installDir = directory;
     }
 
 }

@@ -59,6 +59,7 @@ import org.knime.core.node.CanceledExecutionException;
 import org.knime.core.node.ExecutionContext;
 import org.knime.core.node.ExecutionMonitor;
 import org.knime.core.node.InvalidSettingsException;
+import org.knime.core.node.NodeLogger;
 import org.knime.core.node.NodeModel;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
@@ -67,6 +68,8 @@ import org.knime.core.util.FileUtil;
 import org.knime.ext.tableau.TableauExtract;
 import org.knime.ext.tableau.TableauExtractAPI;
 import org.knime.ext.tableau.TableauExtractOpener;
+import org.knime.ext.tableau.TableauPlugin;
+import org.knime.ext.tableau.TableauPlugin.TABLEAU_SDK;
 import org.knime.ext.tableau.TableauTable;
 import org.knime.ext.tableau.hyper.TableauHyperExtractAPI;
 import org.knime.ext.tableau.hyper.TableauHyperExtractOpener;
@@ -80,6 +83,8 @@ final class SendToTableauHyperNodeModel extends NodeModel {
 
     private static final String EXTRACT_TABLE_NAME = "Extract";
 
+    private static final NodeLogger LOG = NodeLogger.getLogger(SendToTableauHyperNodeModel.class);
+
     private SendToTableauHyperSettings m_settings;
 
     SendToTableauHyperNodeModel() {
@@ -89,6 +94,13 @@ final class SendToTableauHyperNodeModel extends NodeModel {
     @Override
     protected DataTableSpec[] configure(final DataTableSpec[] inSpecs) throws InvalidSettingsException {
         CheckUtils.checkSettingNotNull(m_settings, "No configuration available");
+
+        if (TableauPlugin.getSelectedSDK() != TABLEAU_SDK.HYPER) {
+            throw new InvalidSettingsException("This nodes requires the '" + TABLEAU_SDK.HYPER
+                + "' backend, but the active backend is: '" + TableauPlugin.getSelectedSDK().toString() + "'"
+                + " The Tableau backend can be configured in the Tableau preference page.");
+        }
+
         // TODO check overwrite/append?
         return new DataTableSpec[]{};
     }
@@ -111,7 +123,14 @@ final class SendToTableauHyperNodeModel extends NodeModel {
         final TableauExtractOpener extractOpener = new TableauHyperExtractOpener();
 
         synchronized (TableauHyperExtractAPI.class) {
-            extractAPI.initialize();
+            try {
+                extractAPI.initialize();
+            } catch (Throwable e) {
+                LOG.debug(e);
+                throw new InvalidSettingsException(
+                    "Unable to initialize Tableau backend '" + TABLEAU_SDK.HYPER.toString()
+                        + "', please follow the installation instructions in the node description.");
+            }
             try (final TableauExtract tableauExtract = extractOpener.openExtract(f.getAbsolutePath())) {
                 final TableauTable tableWriter =
                     tableauExtract.createTable(EXTRACT_TABLE_NAME, table.getDataTableSpec());
@@ -122,10 +141,6 @@ final class SendToTableauHyperNodeModel extends NodeModel {
                         String.format("Row %d/%d (\"%s\")", rowIndex, rowCount, r.getKey().toString()));
                     writeProgress.checkCanceled();
                 }
-            } catch (final UnsatisfiedLinkError e) {
-                // TODO move somewhere else?
-                throw new IllegalStateException(
-                    e.getMessage() + " (follow \"Installation\" steps described in node description)", e);
             } finally {
                 extractAPI.cleanup();
             }
@@ -133,6 +148,7 @@ final class SendToTableauHyperNodeModel extends NodeModel {
 
         // Send the file to the tableau server
         final ExecutionMonitor sendProgress = exec.createSubProgress(0.5);
+
         final RestApiConnection restApi = new RestApiConnection(m_settings.getHost());
 
         // Sign in

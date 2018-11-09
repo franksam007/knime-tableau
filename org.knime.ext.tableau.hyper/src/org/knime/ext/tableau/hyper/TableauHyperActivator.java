@@ -48,6 +48,8 @@
  */
 package org.knime.ext.tableau.hyper;
 
+import java.io.File;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -59,10 +61,13 @@ import java.util.stream.Stream;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IConfigurationElement;
+import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.knime.core.node.NodeLogger;
+import org.knime.ext.tableau.TableauPlugin;
+import org.knime.ext.tableau.TableauPlugin.TABLEAU_SDK;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 
@@ -81,11 +86,50 @@ public final class TableauHyperActivator implements BundleActivator {
 
     @Override
     public void start(final BundleContext context) throws Exception {
+
+        if (TableauPlugin.getSelectedSDK() != TABLEAU_SDK.HYPER) {
+            return; // HYPER SDK is not selected, do not load this extension
+        }
+        if (System.getProperty("osgi.os").equals("linux")) {
+            loadLinuxLibraries();
+        } else {
+            TableauHyperInstallDirProvider.setInstallDir(createLibraryPath());
+        }
+    }
+
+    /**
+     * @return the path to the first library
+     * @throws IOException
+     *
+     */
+    private String createLibraryPath() throws IOException {
+        final IExtensionPoint point = Platform.getExtensionRegistry().getExtensionPoint(EXTENSION_POINT_ID);
+
+        final IExtension[] exts = point.getExtensions();
+        if (exts.length > 0) {
+            final IConfigurationElement element = exts[0].getConfigurationElements()[0]; // just get the first element
+            final String pluginID = element.getContributor().getName();
+            final String libName = element.getAttribute("name");
+            if (StringUtils.isEmpty(libName)) {
+                LOGGER.errorWithFormat("Tableau library name cannot be empty in plug-in %s.", pluginID);
+            }
+            final Path path = new Path(element.getAttribute("path"));
+            final URL fileUrl =
+                FileLocator.toFileURL(FileLocator.find(Platform.getBundle(pluginID), path, Collections.emptyMap()));
+            return new File(fileUrl.getPath()).getCanonicalPath();
+        } else {
+            LOGGER.debug("No tableau binary fragments installed -- relying on system's library path");
+        }
+        return null;
+    }
+
+    private void loadLinuxLibraries() throws IOException {
         final IExtensionPoint point = Platform.getExtensionRegistry().getExtensionPoint(EXTENSION_POINT_ID);
         boolean hasAtLeastOneContribution = false;
 
-        for (final Iterator<IConfigurationElement> it = Stream.of(point.getExtensions()).flatMap(
-            ext -> Stream.of(ext.getConfigurationElements())).iterator(); it.hasNext(); ) {
+        for (final Iterator<IConfigurationElement> it =
+            Stream.of(point.getExtensions()).flatMap(ext -> Stream.of(ext.getConfigurationElements())).iterator(); it
+                .hasNext();) {
             final IConfigurationElement element = it.next();
             final String pluginID = element.getContributor().getName();
             final String libName = element.getAttribute("name");
@@ -98,22 +142,22 @@ public final class TableauHyperActivator implements BundleActivator {
             URL url = FileLocator.find(Platform.getBundle(pluginID), path, Collections.emptyMap());
             url = url == null ? null : FileLocator.resolve(url);
             if (url == null) {
-                LOGGER.errorWithFormat("Cannot resolve tableau library resource for plug-in %s, path \"%s\"",
-                    pluginID, pathString);
+                LOGGER.errorWithFormat("Cannot resolve tableau library resource for plug-in %s, path \"%s\"", pluginID,
+                    pathString);
             } else if (!"file".equals(url.getProtocol())) {
                 LOGGER.errorWithFormat("Could not resolve URL \"%s\" relative to bundle \"%s\" as a local file "
-                        + "(original path \"%s\")", url.toString(), pluginID, pathString);
+                    + "(original path \"%s\")", url.toString(), pluginID, pathString);
             } else {
                 try {
                     // must not use url.toURI() -- FileLocator leaves spaces in the URL (see eclipse bug 145096)
-                    java.nio.file.Path folderPath= Paths.get(new URI(url.getProtocol(), url.getFile(), null));
+                    java.nio.file.Path folderPath = Paths.get(new URI(url.getProtocol(), url.getFile(), null));
                     folderPath = folderPath.normalize();
                     LOGGER.debugWithFormat("Added tableau library path: \"%s\"", folderPath);
                     NativeLibrary.addSearchPath(libName, folderPath.toString());
                     hasAtLeastOneContribution = true;
-                } catch (URISyntaxException use) {
-                    LOGGER.error(String.format("Unable to resolve file from URL \"%s\": %s",
-                        url, use.getMessage(), use));
+                } catch (final URISyntaxException use) {
+                    LOGGER
+                        .error(String.format("Unable to resolve file from URL \"%s\": %s", url, use.getMessage(), use));
                 }
             }
         }
@@ -126,5 +170,4 @@ public final class TableauHyperActivator implements BundleActivator {
     public void stop(final BundleContext context) throws Exception {
         // nothing to do
     }
-
 }
