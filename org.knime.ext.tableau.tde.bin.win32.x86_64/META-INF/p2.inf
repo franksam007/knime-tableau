@@ -1,0 +1,3 @@
+instructions.install=\
+    org.knime.product.untar(source:@artifact/tableau-binary/tableau-sdk.tar.gz,\
+                            targetDir:@artifact);

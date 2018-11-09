@@ -1,4 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <?eclipse version="3.2"?>
 <plugin>
+   <extension
+         point="org.knime.ext.tableau.tde">
+      <libFolder
+            name="libFolder"
+            path="Tableau-SDK/bin/">
+      </libFolder>
+   </extension>
 </plugin>
