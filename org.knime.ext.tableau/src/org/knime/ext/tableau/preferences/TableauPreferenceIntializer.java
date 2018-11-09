@@ -44,41 +44,32 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   Oct 5, 2018 (bw): created
+ *   Oct 23, 2018 (gabriel): created
  */
-package org.knime.ext.tableau;
+package org.knime.ext.tableau.preferences;
 
+import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
+import org.eclipse.jface.preference.IPreferenceStore;
+import org.knime.ext.tableau.TableauPlugin;
 import org.knime.ext.tableau.TableauPlugin.TABLEAU_SDK;
 
 /**
- * Wrapper for the Tableau ExtractAPI class.
  *
- * @author Benjamin Wilhelm, KNIME GmbH, Konstanz, Germany
+ * @author Gabriel Einsdorf
  */
-public interface TableauExtractAPI {
+public class TableauPreferenceIntializer extends AbstractPreferenceInitializer {
 
-    /**
-     * @return the TABLEAU_SKD type of this ExtractAPI
-     */
-    TABLEAU_SDK getSDKType();
+    @Override
+    public void initializeDefaultPreferences() {
+        final IPreferenceStore store = TableauPlugin.getDefault().getPreferenceStore();
 
-    /**
-     * @return the used ExtractAPI class
-     */
-    Class<?> getExtractAPIClass();
+        // To maintain backwards compatibility, we need to figure out if tableau TDE is installed.
+        // If this is the case it needs to be set as default, otherwise we set HYPER.
+        if (TableauPlugin.isTDEInstalled()) {
+            store.setDefault(TableauPlugin.TABLEAU_SDK_KEY, TABLEAU_SDK.TDE.name());
+        } else {
+            store.setDefault(TableauPlugin.TABLEAU_SDK_KEY, TABLEAU_SDK.HYPER.name());
+        }
+    }
 
-    /**
-     * Calls <code>initialize</code> on Tableau ExtractAPI class.
-     *
-     * @throws WrappingTableauException if the initialize method throws a TableauException (not documented on Tableau
-     *             side)
-     */
-    void initialize() throws WrappingTableauException;
-
-    /**
-     * Calls <code>cleanup</code> on Tableau ExtractAPI class.
-     *
-     * @throws WrappingTableauException if the cleanup method throws a TableauException (not documented on Tableau side)
-     */
-    void cleanup() throws WrappingTableauException;
 }

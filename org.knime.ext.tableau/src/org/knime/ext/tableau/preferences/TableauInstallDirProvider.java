@@ -44,41 +44,22 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   Oct 5, 2018 (bw): created
+ *   Nov 7, 2018 (gabriel): created
  */
-package org.knime.ext.tableau;
+package org.knime.ext.tableau.preferences;
 
 import org.knime.ext.tableau.TableauPlugin.TABLEAU_SDK;
 
-/**
- * Wrapper for the Tableau ExtractAPI class.
- *
- * @author Benjamin Wilhelm, KNIME GmbH, Konstanz, Germany
- */
-public interface TableauExtractAPI {
+public interface TableauInstallDirProvider {
 
     /**
-     * @return the TABLEAU_SKD type of this ExtractAPI
+     * @return the directory the tableau SDK is installed in
      */
-    TABLEAU_SDK getSDKType();
+    public String installationDir();
 
     /**
-     * @return the used ExtractAPI class
+     * @return the SDK associated with this installation directory
      */
-    Class<?> getExtractAPIClass();
+    public TABLEAU_SDK backend();
 
-    /**
-     * Calls <code>initialize</code> on Tableau ExtractAPI class.
-     *
-     * @throws WrappingTableauException if the initialize method throws a TableauException (not documented on Tableau
-     *             side)
-     */
-    void initialize() throws WrappingTableauException;
-
-    /**
-     * Calls <code>cleanup</code> on Tableau ExtractAPI class.
-     *
-     * @throws WrappingTableauException if the cleanup method throws a TableauException (not documented on Tableau side)
-     */
-    void cleanup() throws WrappingTableauException;
 }

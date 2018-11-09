@@ -66,6 +66,7 @@ import org.knime.core.util.FileUtil;
 import org.knime.ext.tableau.TableauExtract;
 import org.knime.ext.tableau.TableauExtractAPI;
 import org.knime.ext.tableau.TableauExtractOpener;
+import org.knime.ext.tableau.TableauPlugin;
 import org.knime.ext.tableau.TableauTable;
 import org.knime.ext.tableau.extractwrite.TableauExtractSettings.FileOverwritePolicy;
 
@@ -77,7 +78,7 @@ import org.knime.ext.tableau.extractwrite.TableauExtractSettings.FileOverwritePo
  */
 public final class TableauExtractNodeModel extends NodeModel {
 
-    private final static String EXTRACT_TABLE_NAME = "Extract";
+    private static final String EXTRACT_TABLE_NAME = "Extract";
 
     private final TableauExtractAPI m_extractAPI;
 
@@ -99,6 +100,12 @@ public final class TableauExtractNodeModel extends NodeModel {
 
     @Override
     protected DataTableSpec[] configure(final DataTableSpec[] inSpecs) throws InvalidSettingsException {
+
+        if (TableauPlugin.getSelectedSDK() != m_extractAPI.getSDKType()) {
+            throw new InvalidSettingsException("This nodes requires the '" + m_extractAPI.getSDKType().toString()
+                + "' backend, but the active backend is: '" + TableauPlugin.getSelectedSDK().toString() + "'"
+                + " The Tableau backend can be configured in the Tableau preference page.");
+        }
         CheckUtils.checkSettingNotNull(m_settings, "No configuration available");
         final boolean overwrite = m_settings.getFileOverwritePolicy() == FileOverwritePolicy.Overwrite;
         final boolean append = m_settings.getFileOverwritePolicy() == FileOverwritePolicy.Append;
@@ -117,9 +124,8 @@ public final class TableauExtractNodeModel extends NodeModel {
             if (m_settings.getFileOverwritePolicy() == FileOverwritePolicy.Overwrite) {
                 f.delete();
             } else if (m_settings.getFileOverwritePolicy() == FileOverwritePolicy.Abort) {
-                throw new InvalidSettingsException(
-                    String.format("Output file \"%s\" already exists " + "- must not overwrite as per user setting",
-                        f.getAbsolutePath()));
+                throw new InvalidSettingsException(String.format(
+                    "Output file \"%s\" already exists - must not overwrite as per user setting", f.getAbsolutePath()));
             }
         }
         synchronized (m_extractAPI.getClass()) {
@@ -155,6 +161,7 @@ public final class TableauExtractNodeModel extends NodeModel {
 
     @Override
     protected void reset() {
+        // nothing to do here
     }
 
     @Override
