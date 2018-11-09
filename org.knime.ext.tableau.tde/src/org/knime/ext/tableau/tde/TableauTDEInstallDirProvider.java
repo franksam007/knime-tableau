@@ -44,52 +44,36 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   Oct 5, 2018 (bw): created
+ *   Nov 7, 2018 (gabriel): created
  */
 package org.knime.ext.tableau.tde;
 
-import org.knime.ext.tableau.TableauExtractAPI;
 import org.knime.ext.tableau.TableauPlugin.TABLEAU_SDK;
-import org.knime.ext.tableau.WrappingTableauException;
-
-import com.tableausoftware.TableauException;
-import com.tableausoftware.extract.ExtractAPI;
+import org.knime.ext.tableau.preferences.TableauInstallDirProvider;
 
 /**
  *
- * @author Benjamin Wilhelm, KNIME GmbH, Konstanz, Germany
+ * @author Gabriel Einsdorf
  */
-public class TableauTDEExtractAPI implements TableauExtractAPI {
+public class TableauTDEInstallDirProvider implements TableauInstallDirProvider {
+
+    private static String installationDir = "";
 
     @Override
-    public Class<?> getExtractAPIClass() {
-        return ExtractAPI.class;
+    public String installationDir() {
+        return installationDir;
     }
 
     @Override
-    public void initialize() throws WrappingTableauException {
-        try {
-            ExtractAPI.initialize();
-        } catch (final TableauException e) {
-            throw new WrappingTableauException(e);
-        }
-    }
-
-    @Override
-    public void cleanup() throws WrappingTableauException {
-        try {
-            ExtractAPI.cleanup();
-        } catch (final TableauException e) {
-            throw new WrappingTableauException(e);
-        }
+    public TABLEAU_SDK backend() {
+        return TABLEAU_SDK.TDE;
     }
 
     /**
-     * {@inheritDoc}
+     * @param createLibraryPath
      */
-    @Override
-    public TABLEAU_SDK getSDKType() {
-        return TABLEAU_SDK.TDE;
+    static void setInstallDir(final String createLibraryPath) {
+        installationDir = createLibraryPath;
     }
 
 }

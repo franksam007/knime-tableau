@@ -9,10 +9,15 @@
             factory-class="org.knime.ext.tableau.tde.write.TableauDENodeFactory">
       </node>
       <node
-            after="org.knime.ext.tableau.tde.write.TableauDENodeFactory"
             category-path="/labs/tableau"
             factory-class="org.knime.ext.tableau.tde.sendtotableau.SendToTableauNodeFactory">
       </node>
+   </extension>
+   <extension
+         point="org.knime.ext.tableau.installdir">
+      <InstallDir
+            InstallDirProvider="org.knime.ext.tableau.tde.TableauTDEInstallDirProvider">
+      </InstallDir>
    </extension>
  
 </plugin>

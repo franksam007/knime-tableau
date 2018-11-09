@@ -66,6 +66,8 @@ import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.util.CheckUtils;
 import org.knime.core.util.FileUtil;
 import org.knime.ext.tableau.TableauExtract;
+import org.knime.ext.tableau.TableauPlugin;
+import org.knime.ext.tableau.TableauPlugin.TABLEAU_SDK;
 import org.knime.ext.tableau.TableauTable;
 import org.knime.ext.tableau.tde.TableauTDEExtractOpener;
 
@@ -90,6 +92,12 @@ final class SendToTableauNodeModel extends NodeModel {
     /** {@inheritDoc} */
     @Override
     protected DataTableSpec[] configure(final DataTableSpec[] inSpecs) throws InvalidSettingsException {
+        if (TableauPlugin.getSelectedSDK() != TABLEAU_SDK.TDE) {
+            throw new InvalidSettingsException("This nodes requires the '" + TABLEAU_SDK.TDE.toString()
+                + "' backend, but the active backend is: '" + TableauPlugin.getSelectedSDK().toString() + "'"
+                + " The Tableau backend can be configured in the Tableau preference page.");
+        }
+
         CheckUtils.checkSettingNotNull(m_settings, "No configuration available");
         return new DataTableSpec[]{};
     }
