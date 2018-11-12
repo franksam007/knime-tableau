@@ -72,7 +72,6 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreeSelectionModel;
 
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.knime.core.node.NodeLogger;
 import org.knime.ext.tableau.hyper.sendtable.api.RestApiConnection;
 import org.knime.ext.tableau.hyper.sendtable.api.RestApiConnection.TsResponseException;
@@ -240,9 +239,9 @@ final class ProjectChooserPanel {
             } catch (final InterruptedException e) {
                 // Do nothing
             } catch (final ExecutionException e) {
-                LOGGER.warn(e.getCause());
+                LOGGER.warn(e.getCause(), e);
                 JOptionPane.showMessageDialog(SwingUtilities.windowForComponent(m_dialog),
-                    ExceptionUtils.getRootCauseMessage(e), "Connection Failed", JOptionPane.ERROR_MESSAGE);
+                    e.getMessage(), "Connection Failed", JOptionPane.ERROR_MESSAGE);
                 m_dialog.dispose();
             }
         }
