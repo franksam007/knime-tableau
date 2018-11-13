@@ -90,9 +90,10 @@ public final class TableauTDEActivator implements BundleActivator {
             return; // TDE SDK is not selected, do not load the native libs
         }
 
-        final String os = System.getProperty("osgi.os");
-        if (os.equals("linux") || os.equals("macosx")) {
-            // load linux libraries
+
+        final String os = Platform.getOS();
+        if (os.equals(Platform.OS_LINUX) || os.equals(Platform.OS_MACOSX)) {
+            // load libraries
             loadLibraries();
         } else {
             TableauTDEInstallDirProvider.setInstallDir(createLibraryPath());

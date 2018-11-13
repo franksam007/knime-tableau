@@ -49,6 +49,7 @@ import java.io.IOException;
 import java.net.URL;
 
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferencePage;
@@ -149,11 +150,11 @@ public class TableauPreferencePage extends PreferencePage implements IWorkbenchP
 
         // Add additional settings for windows and mac
 
-        final String osName = System.getProperty("osgi.os");
+        final String os = Platform.getOS();
         // Windows
-        if (osName.equals("win32")) {
+        if (os.equals(Platform.WS_WIN32)) {
             addWindowsFields(composite);
-        } else if (osName.equals("macosx") && TableauPlugin.getSelectedSDK() == TABLEAU_SDK.HYPER) {
+        } else if (os.equals(Platform.OS_MACOSX) && (TableauPlugin.getSelectedSDK() == TABLEAU_SDK.HYPER)) {
             addMacHyperFields(composite);
         }
 

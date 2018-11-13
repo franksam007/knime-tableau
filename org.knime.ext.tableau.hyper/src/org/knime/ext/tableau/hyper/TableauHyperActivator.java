@@ -90,7 +90,7 @@ public final class TableauHyperActivator implements BundleActivator {
         if (TableauPlugin.getSelectedSDK() != TABLEAU_SDK.HYPER) {
             return; // HYPER SDK is not selected, do not load this extension
         }
-        if (System.getProperty("osgi.os").equals("linux")) {
+        if (Platform.OS_LINUX.equals(Platform.getOS())) {
             loadLinuxLibraries();
         } else {
             TableauHyperInstallDirProvider.setInstallDir(createLibraryPath());
