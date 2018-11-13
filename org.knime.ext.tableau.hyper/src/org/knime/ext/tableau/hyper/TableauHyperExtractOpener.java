@@ -81,6 +81,8 @@ import com.tableausoftware.hyperextract.Table;
 import com.tableausoftware.hyperextract.TableDefinition;
 
 /**
+ * Converts data into the TableauExtract 2.0 (Hyper) format.
+ *
  * @author Bernd Wiswedel, KNIME AG, Zurich, Switzerland
  * @author Benjamin Wilhelm, KNIME GmbH, Konstanz, Germany
  */

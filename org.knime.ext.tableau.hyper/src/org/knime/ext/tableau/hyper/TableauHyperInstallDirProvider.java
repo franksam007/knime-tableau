@@ -52,6 +52,7 @@ import org.knime.ext.tableau.TableauPlugin.TABLEAU_SDK;
 import org.knime.ext.tableau.preferences.TableauInstallDirProvider;
 
 /**
+ * {@link TableauInstallDirProvider} implementation for the Hyper format.
  *
  * @author Gabriel Einsdorf
  */

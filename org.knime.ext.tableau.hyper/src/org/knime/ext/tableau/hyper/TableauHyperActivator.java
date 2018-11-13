@@ -74,9 +74,10 @@ import org.osgi.framework.BundleContext;
 import com.sun.jna.NativeLibrary;
 
 /**
- * Activator for Tableau binary Plugin
+ * Activator for Tableau Hyper Plugin
  *
  * @author Benjamin Wilhelm, KNIME GmbH, Konstanz, Germany
+ * @author Gabriel Einsdorf, KNIME GmbH, Konstanz, Germany
  */
 public final class TableauHyperActivator implements BundleActivator {
 
@@ -98,9 +99,10 @@ public final class TableauHyperActivator implements BundleActivator {
     }
 
     /**
+     * Creates the library path (to be injected into the {@link TableauHyperInstallDirProvider}).
+     *
      * @return the path to the first library
      * @throws IOException
-     *
      */
     private String createLibraryPath() throws IOException {
         final IExtensionPoint point = Platform.getExtensionRegistry().getExtensionPoint(EXTENSION_POINT_ID);
@@ -123,6 +125,9 @@ public final class TableauHyperActivator implements BundleActivator {
         return null;
     }
 
+    /**
+     * Load the tableau library dynamically
+     */
     private void loadLinuxLibraries() throws IOException {
         final IExtensionPoint point = Platform.getExtensionRegistry().getExtensionPoint(EXTENSION_POINT_ID);
         boolean hasAtLeastOneContribution = false;

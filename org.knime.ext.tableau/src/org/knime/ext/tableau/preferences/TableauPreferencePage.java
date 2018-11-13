@@ -78,7 +78,7 @@ import org.knime.ext.tableau.TableauPlugin.TABLEAU_SDK;
 /**
  * Preference Page for the Tableau integration
  *
- * @author Gabriel Einsdorf
+ * @author Gabriel Einsdorf, KNIME GmbH, Konstanz, Germany
  */
 public class TableauPreferencePage extends PreferencePage implements IWorkbenchPreferencePage {
 

@@ -50,6 +50,11 @@ package org.knime.ext.tableau.preferences;
 
 import org.knime.ext.tableau.TableauPlugin.TABLEAU_SDK;
 
+/**
+ * Interface to allow different sdk plugins to provide installation a path string to the preference page.
+ *
+ * @author Gabriel Einsdorf, KNIME GmbH, Konstanz, Germany
+ */
 public interface TableauInstallDirProvider {
 
     /**

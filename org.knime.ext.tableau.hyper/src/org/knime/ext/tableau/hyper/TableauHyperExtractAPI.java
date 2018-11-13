@@ -56,6 +56,7 @@ import com.tableausoftware.TableauException;
 import com.tableausoftware.hyperextract.ExtractAPI;
 
 /**
+ * {@link TableauExtractAPI} implementation for the Hyper API.
  *
  * @author Benjamin Wilhelm, KNIME GmbH, Konstanz, Germany
  */

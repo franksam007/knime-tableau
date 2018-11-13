@@ -52,10 +52,12 @@ import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.knime.ext.tableau.TableauPlugin;
 import org.knime.ext.tableau.TableauPlugin.TABLEAU_SDK;
+import org.knime.workbench.ui.preferences.PreferenceInitializer;
 
 /**
+ * {@link PreferenceInitializer} for the Tableau perferences page
  *
- * @author Gabriel Einsdorf
+ * @author Gabriel Einsdorf, KNIME GmbH, Konstanz, Germany
  */
 public class TableauPreferenceIntializer extends AbstractPreferenceInitializer {
 
