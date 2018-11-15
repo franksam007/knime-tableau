@@ -155,9 +155,9 @@ final class SendToTableauHyperNodeModel extends NodeModel {
         signIn(restApi);
         final boolean overwrite = m_settings.getOverwrite() == FileOverwritePolicy.OVERWRITE;
         final boolean append = m_settings.getOverwrite() == FileOverwritePolicy.APPEND;
-        checkOverwriteAppend(restApi, m_settings.getProjectId(), overwrite, append);
+        final boolean exists = checkOverwriteAppend(restApi, m_settings.getProjectId(), overwrite, append);
         restApi.invokePublishDataSourceChunked(m_settings.getProjectId(), m_settings.getDatasourceName(), "hyper", f,
-            overwrite, append, sendProgress);
+            overwrite && exists, append && exists, sendProgress);
 
         // Return an empty array
         return new BufferedDataTable[]{};
@@ -167,23 +167,19 @@ final class SendToTableauHyperNodeModel extends NodeModel {
         restApi.invokeSignIn(m_settings.getUsername(), m_settings.getPassword(), m_settings.getSiteContentURL());
     }
 
-    private void checkOverwriteAppend(final RestApiConnection restApi, final String projectId, final boolean overwrite,
+    private boolean checkOverwriteAppend(final RestApiConnection restApi, final String projectId, final boolean overwrite,
         final boolean append) throws TsResponseException, InvalidSettingsException {
         // TODO filter by name in request
         final DataSourceListType datasources = restApi.invokeQueryDatasources();
         final boolean exits = datasources.getDatasource().stream() //
             .filter(d -> d.getName().equals(m_settings.getDatasourceName())) //
             .anyMatch(d -> d.getProject().getId().equals(projectId));
-        if (!overwrite && !append && exits) {
+        if (exits && !overwrite && !append) {
             // File exists but abort is selected
             throw new InvalidSettingsException(
                 "A datasource with the name " + m_settings.getDatasourceName() + " exists in the configured project.");
         }
-        if (append && !exits) {
-            // File doesn't exist but append is selected
-            throw new InvalidSettingsException("A datasource with the name " + m_settings.getDatasourceName()
-                + " doesn't exists in the configured project. The table can not be appended.");
-        }
+        return exits;
     }
 
     @Override
