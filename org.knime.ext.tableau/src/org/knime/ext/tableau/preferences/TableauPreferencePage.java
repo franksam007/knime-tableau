@@ -54,8 +54,10 @@ import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -66,7 +68,6 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.MessageBox;
-import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.eclipse.ui.PlatformUI;
@@ -196,7 +197,7 @@ public class TableauPreferencePage extends PreferencePage implements IWorkbenchP
                 try {
                     Runtime.getRuntime().exec("open -R file://" + path.replaceAll(" ", "%20"));
                 } catch (final IOException e1) {
-                    System.out.print(e1);
+                    // nothing to do
                 }
             }
         });
@@ -220,15 +221,32 @@ public class TableauPreferencePage extends PreferencePage implements IWorkbenchP
 
         final Link instruction = new Link(parent, SWT.NONE);
         instruction.setText("2): Add the following String to your PATH environment variable: "
-            + "<a href=\"https://www.computerhope.com/issues/ch000549.htm\">(Instructions)</a>");
+            + "<a href=\"https://www.computerhope.com/issues/ch000549.htm\"> Instructions</a>");
+        instruction.addSelectionListener(new UriOpenListener());
 
         final String path = TableauPlugin.getTableauInstallPath();
         final String DIR_KEY = "org.knime.ext.tableau.dir";
         getPreferenceStore().setValue(DIR_KEY, path);
 
-        final Text pathField = new Text(parent, SWT.READ_ONLY);
+        final StyledText pathField = new StyledText(parent, SWT.READ_ONLY | SWT.H_SCROLL);
         pathField.setText(path);
 
+        GridData fd = new GridData();
+        fd.widthHint = 500;
+        fd.heightHint = 25;
+        pathField.setLayoutData(fd);
+
+        final Button copyButton = new Button(parent, SWT.PUSH);
+        copyButton.setText("Copy to Clipboard");
+        copyButton.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(final SelectionEvent e) {
+                Point p = pathField.getSelection();
+                pathField.selectAll();
+                pathField.copy();
+                pathField.setSelection(p);
+            }
+        });
         final Link visCpp = new Link(parent, SWT.NONE);
         visCpp.setText(
             "3): Download and install <a href=\"https://www.microsoft.com/en-US/download/details.aspx?id=40784\">"
