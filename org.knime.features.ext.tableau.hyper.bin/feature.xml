@@ -1,15 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
       id="org.knime.features.ext.tableau.hyper.bin"
-      label="KNIME Tableau Extract API 2.0 (Linux/Mac) - Hyper Format - Experimental"
+      label="KNIME Tableau Extract API 2.0 (Hyper) Platform specific packages"
       version="3.7.0.qualifier"
       provider-name="KNIME AG, Zurich, Switzerland"
       arch="x86_64">
 
    <description>
-      Tableau SDK packages for Linux and Mac. These binaries are required for the KNIME Tableau nodes to work, whereby the recommended path is to download the SDK separately and set environment variables accordingly (see Tableau SDK web page or node description of the respective nodes). This extensions saves this step.
-
-This package is experimental and interferes with the Tableau SDK bootstrap code. It&apos;s currently not available for Windows systems (though installation of this extension is possible as it&apos;s &apos;blank&apos; for Windows).
+      Tableau Extract API 2.0 (Hyper) binaries for Linux, Mac and Windows.
+These binaries are required for the KNIME Tableau (Hyper) nodes.
    </description>
 
    <copyright>
