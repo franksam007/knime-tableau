@@ -140,7 +140,7 @@ public final class TableauExtractNodeModel extends NodeModel {
                 LOG.debug(e);
                 throw new InvalidSettingsException(
                     "Unable to initialize Tableau backend '" + m_extractAPI.getSDKType().toString()
-                        + "', please follow the installation instructions in the node description.");
+                        + "', please follow the installation instructions in the node description. Error: " + e);
             }
             try (final TableauExtract tableauExtract = m_extractCreator.openExtract(f.getAbsolutePath())) {
                 TableauTable tableWriter = null;

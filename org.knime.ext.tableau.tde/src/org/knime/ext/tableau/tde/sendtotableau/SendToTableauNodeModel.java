@@ -146,7 +146,8 @@ final class SendToTableauNodeModel extends NodeModel {
                 }
             }
         } catch (UnsatisfiedLinkError e) {
-            throw new Exception(e.getMessage() + " (follow \"Installation\" steps described in node description)", e);
+            throw new InvalidSettingsException("Unable to initialize Tableau backend '" + TABLEAU_SDK.HYPER.toString()
+                + "', please follow the installation instructions in the node description. Error:" + e);
         } finally {
             t.delete();
         }

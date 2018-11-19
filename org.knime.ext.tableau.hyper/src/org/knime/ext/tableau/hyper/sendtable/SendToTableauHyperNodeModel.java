@@ -129,7 +129,7 @@ final class SendToTableauHyperNodeModel extends NodeModel {
                 LOG.debug(e);
                 throw new InvalidSettingsException(
                     "Unable to initialize Tableau backend '" + TABLEAU_SDK.HYPER.toString()
-                        + "', please follow the installation instructions in the node description.");
+                        + "', please follow the installation instructions in the node description. Error:" + e);
             }
             try (final TableauExtract tableauExtract = extractOpener.openExtract(f.getAbsolutePath())) {
                 final TableauTable tableWriter =
