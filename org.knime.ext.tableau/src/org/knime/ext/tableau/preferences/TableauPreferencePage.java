@@ -47,6 +47,7 @@ package org.knime.ext.tableau.preferences;
 
 import java.io.IOException;
 import java.net.URL;
+import java.nio.file.InvalidPathException;
 
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.core.runtime.Platform;
@@ -72,6 +73,8 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.browser.IWebBrowser;
+import org.knime.core.node.NodeLogger;
+import org.knime.core.util.FileUtil;
 import org.knime.core.util.SWTUtilities;
 import org.knime.ext.tableau.TableauPlugin;
 import org.knime.ext.tableau.TableauPlugin.TABLEAU_SDK;
@@ -82,6 +85,8 @@ import org.knime.ext.tableau.TableauPlugin.TABLEAU_SDK;
  * @author Gabriel Einsdorf, KNIME GmbH, Konstanz, Germany
  */
 public class TableauPreferencePage extends PreferencePage implements IWorkbenchPreferencePage {
+
+    private static final NodeLogger LOGGER = NodeLogger.getLogger(TableauPreferencePage.class);
 
     private boolean m_apply = false;
 
@@ -195,23 +200,27 @@ public class TableauPreferencePage extends PreferencePage implements IWorkbenchP
             @Override
             public void widgetSelected(final SelectionEvent e) {
                 try {
-                    Runtime.getRuntime().exec("open -R file://" + path.replaceAll(" ", "%20"));
-                } catch (final IOException e1) {
-                    // nothing to do
+                    URL url = FileUtil.toURL(path);
+                    Runtime.getRuntime().exec("open -R " + url);
+                } catch (final IOException | InvalidPathException e1) {
+                    LOGGER.debug(String.format("Unable to open path '%s'", path), e1);
                 }
             }
         });
+        sourceFolderButton.setEnabled(StringUtils.isNotEmpty(path));
 
         targetFolderButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(final SelectionEvent e) {
+                String libPath = "/Library/Frameworks";
                 try {
-                    Runtime.getRuntime().exec("open /Library/Frameworks");
-                } catch (final IOException e1) {
-                    // nothing to do
+                    Runtime.getRuntime().exec("open " + libPath);
+                } catch (final IOException | InvalidPathException e1) {
+                    LOGGER.debug(String.format("Unable to open path '%s'", libPath), e1);
                 }
             }
         });
+        targetFolderButton.setEnabled(StringUtils.isNotEmpty(path));
     }
 
     /**
