@@ -3,7 +3,8 @@
       id="org.knime.features.ext.tableau.bin"
       label="KNIME Tableau SDK (Linux/Mac) - TDE Format - Experimental"
       version="3.7.0.qualifier"
-      provider-name="KNIME AG, Zurich, Switzerland">
+      provider-name="KNIME AG, Zurich, Switzerland"
+      arch="x86_64">
 
    <description>
       Tableau SDK packages for Linux and Mac. These binaries are required for the KNIME Tableau nodes to work, whereby the recommended path is to download the SDK separately and set environment variables accordingly (see Tableau SDK web page or node description of the respective nodes). This extensions saves this step.
