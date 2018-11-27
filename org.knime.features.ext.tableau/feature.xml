@@ -4,7 +4,8 @@
       label="KNIME Tableau Integration - TDE Format"
       version="3.7.0.qualifier"
       provider-name="KNIME AG, Zurich, Switzerland"
-      plugin="org.knime.ext.tableau.tde">
+      plugin="org.knime.ext.tableau.tde"
+      arch="x86_64">
 
    <description>
       KNIME extension offering Tableau integration.
