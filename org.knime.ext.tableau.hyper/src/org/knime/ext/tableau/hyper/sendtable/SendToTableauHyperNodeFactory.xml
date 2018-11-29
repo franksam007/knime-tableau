@@ -52,7 +52,7 @@
 				<ol>
 					<li>
 						Open the Tableau Preferences page and select
-						<b>Tableau TDE</b>
+						<b>Tableau Hyper</b>
 					</li>
 					<li>When prompted restart KNIME Analytics Platform</li>
 					<li>Depending on your operating system, you need to perform
