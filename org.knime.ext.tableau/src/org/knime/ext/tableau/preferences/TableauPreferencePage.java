@@ -230,7 +230,8 @@ public class TableauPreferencePage extends PreferencePage implements IWorkbenchP
 
         final Link instruction = new Link(parent, SWT.NONE);
         instruction.setText("2): Add the following String to your PATH environment variable: "
-            + "<a href=\"https://www.computerhope.com/issues/ch000549.htm\"> Instructions</a>");
+                + "<a href=\"https://www.computerhope.com/issues/ch000549.htm\"> Instructions</a>, \n"
+                + "(Don't forget to restart KNIME Analytics Platform after updating the PATH variable)");
         instruction.addSelectionListener(new UriOpenListener());
 
         final String path = TableauPlugin.getTableauInstallPath();
