@@ -21,6 +21,11 @@
 				Uses version 2.8 of the Tableau Server REST API. Therefore the
 				minimum Tableau server version is 10.5.
 			</p>
+			<p>
+				In order to use this library the user needs to perform the
+				installation steps as described on the
+				<a href="https://www.knime.com/reporting/tableau">Tableau Integration page.</a>
+			</p>
 		</intro>
 		<tab name="Main Configuration">
 			<option name="Host">The URL of the server to connect to. Including

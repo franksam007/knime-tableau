@@ -8,7 +8,7 @@
     
     <fullDescription>
         <intro>
-        	<p>Writes the input table as Tableau Data Extract (Hyper) file. This node uses the Tableau SDK library to
+        	<p>Writes the input table as Tableau Data Extract (Hyper) file. This node uses the Tableau Extract 2.0 library to
         	   write the file.</p>
         	<p>
 				In order to use this library the user needs to perform the
