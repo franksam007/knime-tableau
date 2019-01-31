@@ -752,4 +752,18 @@ propagated with or for interoperation with KNIME.
          install-size="0"
          version="0.0.0"/>
 
+   <plugin
+         id="org.knime.ext.tableau"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.knime.ext.tableau.tde"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
 </feature>
