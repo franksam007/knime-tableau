@@ -3,17 +3,11 @@ Bundle-ManifestVersion: 2
 Bundle-Name: KNIME Tableau Integration - TDE Format
 Bundle-SymbolicName: org.knime.ext.tableau.tde;singleton:=true
 Bundle-Version: 3.7.0.qualifier
-Bundle-ClassPath: .,
-  lib/jna.jar,
-  lib/tableaucommon.jar,
-  lib/tableauextract.jar,
-  lib/tableauserver.jar
+Bundle-ClassPath: .
 Bundle-Activator: org.knime.ext.tableau.tde.TableauTDEActivator
 Bundle-Vendor: KNIME AG, Zurich, Switzerland
-Export-Package: org.knime.ext.tableau.tde,
- org.knime.ext.tableau.tde.sendtotableau,
- org.knime.ext.tableau.tde.write
 Require-Bundle: org.knime.ext.tableau;bundle-version="[3.7.0,4.0.0)",
+ org.knime.ext.tableau.tde.lib;bundle-version="3.7.0",
  org.knime.core;bundle-version="[3.2.0,4.0.0)",
  org.knime.base;bundle-version="[3.2.0,4.0.0)",
  org.knime.time;bundle-version="[3.7.0,4.0.0)",

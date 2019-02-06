@@ -1,0 +1,16 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: KNIME Tableau Integration - Hyper format - Libs
+Bundle-SymbolicName: org.knime.ext.tableau.hyper.lib;singleton:=true
+Bundle-Version: 3.7.0.qualifier
+Bundle-ClassPath: lib/jna.jar,
+ lib/tableaucommon.jar,
+ lib/tableauhyperextract.jar
+Bundle-Vendor: KNIME AG, Zurich, Switzerland
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Bundle-ActivationPolicy: lazy
+Eclipse-PlatformFilter: (osgi.arch=x86_64)
+Export-Package: com.sun.jna,
+ com.tableausoftware,
+ com.tableausoftware.common,
+ com.tableausoftware.hyperextract
