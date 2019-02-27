@@ -1,7 +1,3 @@
-This plugin project provides nodes and functionality as an extension for KNIME.
+This Plugin is part of the KNIME Analytics offering and contains source code for the nodes "Tableau Writer (TDE)" and "Send to Tableau (TDE)". The source code is compiled against the Tableau SDK which is contained in the plugin "org.knime.ext.tableau.hyper.lib".
 
-It is released under the General Public License (GPL), Version 3 (including 
-certain additional permissions according to Sec. 7 of the GPL, see the file 
-LICENSE.TXT, which should be located in the same directory as this file). 
-If you didn't receive a copy of the license file, please contact us: 
-contact@knime.com
+If you have any questions, please contact KNIME: contact@knime.com
