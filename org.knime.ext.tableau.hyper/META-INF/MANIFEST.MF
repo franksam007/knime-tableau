@@ -6,7 +6,7 @@ Bundle-Version: 3.7.0.qualifier
 Bundle-ClassPath: .
 Bundle-Vendor: KNIME AG, Zurich, Switzerland
 Require-Bundle: org.knime.ext.tableau;bundle-version="[3.7.0,4.0.0)",
- org.knime.ext.tableau.hyper.lib;bundle-version="3.7.0",
+ org.knime.ext.tableau.hyper.lib;bundle-version="[3.7.0,4.0.0)",
  org.knime.core;bundle-version="[3.7.0,4.0.0)",
  org.knime.base;bundle-version="[3.7.0,4.0.0)",
  org.knime.time;bundle-version="[3.7.0,4.0.0)",
