@@ -53,8 +53,12 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.ws.rs.ProcessingException;
 import javax.ws.rs.core.MediaType;
@@ -97,6 +101,9 @@ import org.knime.ext.tableau.hyper.sendtable.api.binding.TsResponse;
  * @author Benjamin Wilhelm, KNIME GmbH, Konstanz, Germany
  */
 public final class RestApiConnection {
+
+    /** 500 datasources per page: Fewer API calls */
+    private static final int DEFAULT_DATASOURCES_PAGE_SIZE = 500;
 
     /** 30 seconds */
     private static final long DEFAULT_CONNECTION_TIMEOUT = 30000;
@@ -217,6 +224,45 @@ public final class RestApiConnection {
         final String url = getUriBuilder().path(QUERY_DATA_SOURCES).build(m_siteId).toString();
         final TsResponse response = get(url);
         return response.getDatasources();
+    }
+
+    /**
+     * TODO
+     */
+    public DataSourceListType invokeQueryDatasources(final TsFilterExpression filter) throws TsResponseException {
+        checkSignedIn();
+        // The filter parameter is added manually such that it is not encoded by the URI Builder
+        // filter#getExperssion already encodes the name of the datasource
+        final String filterParam = "?filter=" + filter.getExpression();
+        final String url = getUriBuilder().path(QUERY_DATA_SOURCES).build(m_siteId).toString() + filterParam;
+        System.out.println(url);
+        final TsResponse response = get(url);
+        return response.getDatasources();
+    }
+
+    /**
+     * TODO
+     */
+    public List<DataSourceType> invokeQueryAllDatasources(final List<String> fields) throws TsResponseException {
+        checkSignedIn();
+        final String fieldExpression = fields.stream().collect(Collectors.joining(","));
+        final List<DataSourceType> datasources = new ArrayList<>();
+        int pageNumber = 1; // Tableau starts counting at 1
+        int lastPage;
+        do {
+            final String url = getUriBuilder().path(QUERY_DATA_SOURCES) //
+                .queryParam("pageNumber", pageNumber) //
+                .queryParam("pageSize", DEFAULT_DATASOURCES_PAGE_SIZE) //
+                .queryParam("fields", fieldExpression) //
+                .build(m_siteId).toString();
+            final TsResponse response = get(url);
+            // Add all new datasources to the existing list
+            datasources.addAll(response.getDatasources().getDatasource());
+
+            lastPage = response.getPagination().getTotalAvailable().intValue();
+            pageNumber++;
+        } while (pageNumber <= lastPage);
+        return datasources;
     }
 
     /**
@@ -370,6 +416,21 @@ public final class RestApiConnection {
         return client;
     }
 
+    private WebClient getClientUnencoded(final String url) {
+        final WebClient client = WebClient.create(url);
+
+        // Set the timeout
+        final HTTPConduit httpConduit = WebClient.getConfig(client).getHttpConduit();
+        httpConduit.getClient().setConnectionTimeout(m_connectionTimeout);
+        httpConduit.getClient().setReceiveTimeout(m_receiveTimeout);
+
+        // Set the auth token if signed in
+        if (m_signedIn) {
+            client.header(TABLEAU_AUTH_HEADER, m_token);
+        }
+        return client;
+    }
+
     private TsResponse post(final String url, final TsRequest requestPayload) throws TsResponseException {
         final WebClient client = getClient(url);
         client.accept(MediaType.APPLICATION_XML);
@@ -396,6 +457,13 @@ public final class RestApiConnection {
     }
 
     private TsResponse get(final String url) throws TsResponseException {
+        final WebClient client = getClient(url);
+        client.accept(MediaType.APPLICATION_XML);
+        final Response response = client.get();
+        return checkResponse(response);
+    }
+
+    private TsResponse getUnencoded(final String url) throws TsResponseException {
         final WebClient client = getClient(url);
         client.accept(MediaType.APPLICATION_XML);
         final Response response = client.get();
@@ -431,6 +499,65 @@ public final class RestApiConnection {
 
         private TsResponseException(final String message, final Exception cause) {
             super(message, cause);
+        }
+    }
+
+    public static TsFilterExpression eqFilterExpression(final String field, final String value) {
+        return new TsFilterExpression(field, TsFilterOperator.EQ, value);
+    }
+
+    public static class TsFilterExpression {
+
+        private String m_field;
+
+        private TsFilterOperator m_operator;
+
+        private String m_value;
+
+        public TsFilterExpression(final String field, final TsFilterOperator operator, final String value) {
+            m_field = field;
+            m_operator = operator;
+            m_value = value;
+        }
+
+        public String getExpression() {
+            try {
+                return m_field + ":" + m_operator.getOperator() + ":" + URLEncoder.encode(m_value, "UTF-8");
+            } catch (final UnsupportedEncodingException e) {
+                throw new IllegalStateException("Cannot encode the value as UTF-8. This is an implementation error.",
+                    e);
+            }
+        }
+    }
+
+    /** Filter query operator */
+    public enum TsFilterOperator {
+            /** Equals */
+            EQ("eq"),
+            /** Greater than */
+            GT("gt"),
+            /** Greater than or equal */
+            GTE("gte"),
+            /** contains the specified string */
+            HAS("has"),
+            /** Lower than */
+            LT("lt"),
+            /** Lower than or equal */
+            LTE("lte"),
+            /** Any of [list] (for searching tags) */
+            IN("in");
+
+        private final String m_operator;
+
+        private TsFilterOperator(final String operator) {
+            m_operator = operator;
+        }
+
+        /**
+         * @return the operator that is used in an expression
+         */
+        public String getOperator() {
+            return m_operator;
         }
     }
 }
