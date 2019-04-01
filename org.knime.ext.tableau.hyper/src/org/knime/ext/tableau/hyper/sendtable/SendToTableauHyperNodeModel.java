@@ -101,7 +101,8 @@ final class SendToTableauHyperNodeModel extends NodeModel {
                 + " The Tableau backend can be configured in the Tableau preference page.");
         }
 
-        // TODO check overwrite/append?
+        // NOTE: If overwrite/append/abort is valid will be checked during the execution because
+        // it requires at least 2 REST calls
         return new DataTableSpec[]{};
     }
 
@@ -154,10 +155,11 @@ final class SendToTableauHyperNodeModel extends NodeModel {
         // Sign in
         signIn(restApi);
         final boolean overwrite = m_settings.getOverwrite() == FileOverwritePolicy.OVERWRITE;
-        final boolean append = m_settings.getOverwrite() == FileOverwritePolicy.APPEND;
-        final boolean exists = checkOverwriteAppend(restApi, m_settings.getProjectId(), overwrite, append);
+        // NOTE: checkExists is only called if append is activated in the settings
+        final boolean append = m_settings.getOverwrite() == FileOverwritePolicy.APPEND && //
+            checkExists(restApi, m_settings.getProjectId());
         restApi.invokePublishDataSourceChunked(m_settings.getProjectId(), m_settings.getDatasourceName(), "hyper", f,
-            overwrite && exists, append && exists, sendProgress);
+            overwrite, append, sendProgress);
 
         // Return an empty array
         return new BufferedDataTable[]{};
@@ -167,19 +169,14 @@ final class SendToTableauHyperNodeModel extends NodeModel {
         restApi.invokeSignIn(m_settings.getUsername(), m_settings.getPassword(), m_settings.getSiteContentURL());
     }
 
-    private boolean checkOverwriteAppend(final RestApiConnection restApi, final String projectId, final boolean overwrite,
-        final boolean append) throws TsResponseException, InvalidSettingsException {
-        // TODO filter by name in request
+    private boolean checkExists(final RestApiConnection restApi, final String projectId)
+        throws TsResponseException, InvalidSettingsException {
+        // TODO Loop over pages
+        // TODO describe issue with filter
         final DataSourceListType datasources = restApi.invokeQueryDatasources();
-        final boolean exits = datasources.getDatasource().stream() //
+        return datasources.getDatasource().stream() //
             .filter(d -> d.getName().equals(m_settings.getDatasourceName())) //
             .anyMatch(d -> d.getProject().getId().equals(projectId));
-        if (exits && !overwrite && !append) {
-            // File exists but abort is selected
-            throw new InvalidSettingsException(
-                "A datasource with the name " + m_settings.getDatasourceName() + " exists in the configured project.");
-        }
-        return exits;
     }
 
     @Override
