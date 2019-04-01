@@ -76,7 +76,6 @@ import org.knime.ext.tableau.hyper.TableauHyperExtractOpener;
 import org.knime.ext.tableau.hyper.sendtable.SendToTableauHyperSettings.FileOverwritePolicy;
 import org.knime.ext.tableau.hyper.sendtable.api.RestApiConnection;
 import org.knime.ext.tableau.hyper.sendtable.api.RestApiConnection.TsResponseException;
-import org.knime.ext.tableau.hyper.sendtable.api.binding.DataSourceListType;
 
 /** @author Benjamin Wilhelm, KNIME GmbH, Konstanz, Germany */
 final class SendToTableauHyperNodeModel extends NodeModel {
@@ -157,7 +156,7 @@ final class SendToTableauHyperNodeModel extends NodeModel {
         final boolean overwrite = m_settings.getOverwrite() == FileOverwritePolicy.OVERWRITE;
         // NOTE: checkExists is only called if append is activated in the settings
         final boolean append = m_settings.getOverwrite() == FileOverwritePolicy.APPEND && //
-            checkExists(restApi, m_settings.getProjectId());
+            restApi.existsDatasource(m_settings.getDatasourceName(), m_settings.getProjectId());
         restApi.invokePublishDataSourceChunked(m_settings.getProjectId(), m_settings.getDatasourceName(), "hyper", f,
             overwrite, append, sendProgress);
 
@@ -167,16 +166,6 @@ final class SendToTableauHyperNodeModel extends NodeModel {
 
     private void signIn(final RestApiConnection restApi) throws TsResponseException {
         restApi.invokeSignIn(m_settings.getUsername(), m_settings.getPassword(), m_settings.getSiteContentURL());
-    }
-
-    private boolean checkExists(final RestApiConnection restApi, final String projectId)
-        throws TsResponseException, InvalidSettingsException {
-        // TODO Loop over pages
-        // TODO describe issue with filter
-        final DataSourceListType datasources = restApi.invokeQueryDatasources();
-        return datasources.getDatasource().stream() //
-            .filter(d -> d.getName().equals(m_settings.getDatasourceName())) //
-            .anyMatch(d -> d.getProject().getId().equals(projectId));
     }
 
     @Override

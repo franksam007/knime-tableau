@@ -104,6 +104,9 @@ public final class RestApiConnection {
     /** 60 seconds */
     private static final long DEFAULT_RECEIVE_TIMEOUT = 60000;
 
+    /** Default page size for query datasources */
+    private static final long DATASOURCES_PAGE_SIZE = 200;
+
     /** 100KB per chunk (as in the example) */
     private static final int UPLOAD_CHUNK_SIZE = 100000;
 
@@ -217,6 +220,55 @@ public final class RestApiConnection {
         final String url = getUriBuilder().path(QUERY_DATA_SOURCES).build(m_siteId).toString();
         final TsResponse response = get(url);
         return response.getDatasources();
+    }
+
+    /**
+     * Checks if the datasource with the given name exists in the given project.
+     *
+     * @param name the name of the datasource
+     * @param projectId the identifier of the project
+     * @return true if the datasource exists
+     * @throws TsResponseException if the server responds with an non successful response code
+     */
+    public boolean existsDatasource(final String name, final String projectId) throws TsResponseException {
+        checkSignedIn();
+
+        /*
+         * NOTE:
+         * In the following code we loop over the pages of a query datasources REST call. It would be faster to do only
+         * one call with a filter with the datasource name (the Tableau server would do the work for us). This is
+         * tricky because the REST API requires a filter to separate the operator with an unencoded ':'
+         * (syntax: filter=field:operator:value) but the WebClient always encodes a URL (and there is no way to
+         * overwrite this behavior).
+         *
+         * Also see:
+         * https://onlinehelp.tableau.com/v2018.3/api/rest_api/en-us/REST/rest_api_concepts_filtering_and_sorting.htm
+         */
+
+        int currentPage = 1; // Tableau starts counting at 1
+        int lastPage;
+        do {
+            // Query the datasources page
+            final String url = getUriBuilder().path(QUERY_DATA_SOURCES) //
+                .queryParam("pageNumber", currentPage) //
+                .queryParam("pageSize", DATASOURCES_PAGE_SIZE) //
+                .queryParam("fields", "name,project.id") // Ask only for the relevant fields: Smaller response
+                .build(m_siteId).toString();
+            final TsResponse response = get(url);
+
+            // Check if the response contains a datasource with the name and project
+            final List<DataSourceType> datasources = response.getDatasources().getDatasource();
+            if (datasources.stream() //
+                .filter(d -> d.getName().equals(name)) //
+                .anyMatch(d -> d.getProject().getId().equals(projectId))) {
+                return true;
+            }
+
+            // Next page
+            currentPage++;
+            lastPage = response.getPagination().getTotalAvailable().intValue();
+        } while (lastPage >= currentPage);
+        return false;
     }
 
     /**
