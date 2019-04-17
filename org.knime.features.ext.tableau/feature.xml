@@ -2,7 +2,7 @@
 <feature
       id="org.knime.features.ext.tableau"
       label="KNIME Tableau Integration - TDE Format"
-      version="3.7.0.qualifier"
+      version="3.7.2.qualifier"
       provider-name="KNIME AG, Zurich, Switzerland"
       plugin="org.knime.ext.tableau.tde"
       arch="x86_64">
@@ -16,12 +16,12 @@
    </copyright>
 
    <license>
-Terms for License of Tableau Library Feature
+      Terms for License of Tableau Library Feature
 
 0. General
 ===========
-This feature and the Tableau library in binary object code form ("Library") is provided to you by KNIME AG, Switzerland ("KNIME") on a special license, that allows you to freely use this feature, but no further rights are granted with this license agreement. You must not extract this feature and/or the Library from its bundle. You may only use it in combination with other features of the KNIME Analytics Platform.
-The Library is the intellectual property of Tableau Software, Inc., Seattle, WA, USA ("Tableau") or its licensors. The Library is protected by law, including without limitation copyright laws, U.S. Patents and Trademarks as noted at http://www.tableausoftware.com/IP. Except for the rights explicitly granted to you in this License Agreement, all right, title and interest in the Library are reserved. You do not acquire any intellectual property or other rights in the Library as a result of downloading the feature or the Library.
+This feature and the Tableau library in binary object code form (&quot;Library&quot;) is provided to you by KNIME AG, Switzerland (&quot;KNIME&quot;) on a special license, that allows you to freely use this feature, but no further rights are granted with this license agreement. You must not extract this feature and/or the Library from its bundle. You may only use it in combination with other features of the KNIME Analytics Platform.
+The Library is the intellectual property of Tableau Software, Inc., Seattle, WA, USA (&quot;Tableau&quot;) or its licensors. The Library is protected by law, including without limitation copyright laws, U.S. Patents and Trademarks as noted at http://www.tableausoftware.com/IP. Except for the rights explicitly granted to you in this License Agreement, all right, title and interest in the Library are reserved. You do not acquire any intellectual property or other rights in the Library as a result of downloading the feature or the Library.
 
 1. Use of the Library; Distribution
 =====================================
@@ -33,13 +33,13 @@ You may not use the Library for any illegal purpose. You may not, and you will n
 
 3. Disclaimer of Warranties and Limitation of Liability
 ========================================================
-a. YOU EXPRESSLY ACKNOWLEDGE AND AGREE THAT INSTALLATION AND USE OF, AND ANY OTHER ACCESS TO, THE LIBRARY IS AT YOUR SOLE RISK. THE LIBRARY IS DELIVERED TO YOU "AS IS" WITH ALL FAULTS AND WITHOUT WARRANTY OF ANY KIND, AND KNIME DISCLAIMS ALL WARRANTIES, EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, ACCURACY, QUIET ENJOYMENT, AND NON-INFRINGEMENT. NO ORAL OR WRITTEN INFORMATION OR ADVICE GIVEN BY KNIME OR AN AUTHORIZED REPRESENTATIVE OF KNIME WILL CREATE A WARRANTY.
+a. YOU EXPRESSLY ACKNOWLEDGE AND AGREE THAT INSTALLATION AND USE OF, AND ANY OTHER ACCESS TO, THE LIBRARY IS AT YOUR SOLE RISK. THE LIBRARY IS DELIVERED TO YOU &quot;AS IS&quot; WITH ALL FAULTS AND WITHOUT WARRANTY OF ANY KIND, AND KNIME DISCLAIMS ALL WARRANTIES, EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, ACCURACY, QUIET ENJOYMENT, AND NON-INFRINGEMENT. NO ORAL OR WRITTEN INFORMATION OR ADVICE GIVEN BY KNIME OR AN AUTHORIZED REPRESENTATIVE OF KNIME WILL CREATE A WARRANTY.
 
-b. TO THE EXTENT NOT PROHIBITED BY LAW, KNIME WILL NOT BE LIABLE TO YOU FOR ANY INCIDENTAL OR CONSEQUENTIAL DAMAGES FOR BREACH OF ANY EXPRESS OR IMPLIED WARRANTY, BREACH OF CONTRACT, NEGLIGENCE, STRICT LIABILITY, OR ANY OTHER LEGAL THEORY RELATED TO THE LIBRARY, INCLUDING WITHOUT LIMITATION ANY DAMAGES ARISING OUT OF LOSS OF PROFITS, REVENUE, DATA, OR USE OF THE LIBRARY, EVEN IF KNIME HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. IN ANY CASE, KNIME'S AGGREGATE LIABILITY UNDER THIS LICENSE AGREEMENT WILL BE LIMITED TO $25.00.
+b. TO THE EXTENT NOT PROHIBITED BY LAW, KNIME WILL NOT BE LIABLE TO YOU FOR ANY INCIDENTAL OR CONSEQUENTIAL DAMAGES FOR BREACH OF ANY EXPRESS OR IMPLIED WARRANTY, BREACH OF CONTRACT, NEGLIGENCE, STRICT LIABILITY, OR ANY OTHER LEGAL THEORY RELATED TO THE LIBRARY, INCLUDING WITHOUT LIMITATION ANY DAMAGES ARISING OUT OF LOSS OF PROFITS, REVENUE, DATA, OR USE OF THE LIBRARY, EVEN IF KNIME HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. IN ANY CASE, KNIME&apos;S AGGREGATE LIABILITY UNDER THIS LICENSE AGREEMENT WILL BE LIMITED TO $25.00.
 
 4. Miscellaneous
 =================
-With this license agreement you receive a license for the Library from KNIME. Tableau and others are the owner of the Library, but KNIME and Tableau are not in any way through this agreement in any kind of partnership, joint venture, or any other relationship - and nothing in this agreement implies this. KNIME is no representative or agent of Tableau and has no authority to enter into any agreement on Tableau's behalf or on Tableau's name or otherwise bind Tableau to any agreement or obligation.
+With this license agreement you receive a license for the Library from KNIME. Tableau and others are the owner of the Library, but KNIME and Tableau are not in any way through this agreement in any kind of partnership, joint venture, or any other relationship - and nothing in this agreement implies this. KNIME is no representative or agent of Tableau and has no authority to enter into any agreement on Tableau&apos;s behalf or on Tableau&apos;s name or otherwise bind Tableau to any agreement or obligation.
 
 5. Source Code
 ===============
