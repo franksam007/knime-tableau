@@ -246,7 +246,8 @@ public final class RestApiConnection {
          */
 
         int currentPage = 1; // Tableau starts counting at 1
-        int lastPage;
+        int totalReturned = 0;
+        int totalAvailable;
         do {
             // Query the datasources page
             final String url = getUriBuilder().path(QUERY_DATA_SOURCES) //
@@ -266,8 +267,10 @@ public final class RestApiConnection {
 
             // Next page
             currentPage++;
-            lastPage = response.getPagination().getTotalAvailable().intValue();
-        } while (lastPage >= currentPage);
+            // NOTE: total available is the number of datasources available
+            totalAvailable = response.getPagination().getTotalAvailable().intValue();
+            totalReturned += response.getPagination().getPageSize().intValue();
+        } while (totalReturned < totalAvailable);
         return false;
     }
 
