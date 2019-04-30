@@ -53,6 +53,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigInteger;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -246,8 +247,8 @@ public final class RestApiConnection {
          */
 
         int currentPage = 1; // Tableau starts counting at 1
-        int totalReturned = 0;
-        int totalAvailable;
+        BigInteger totalReturned = BigInteger.ZERO;
+        BigInteger totalAvailable;
         do {
             // Query the datasources page
             final String url = getUriBuilder().path(QUERY_DATA_SOURCES) //
@@ -268,9 +269,9 @@ public final class RestApiConnection {
             // Next page
             currentPage++;
             // NOTE: total available is the number of datasources available
-            totalAvailable = response.getPagination().getTotalAvailable().intValue();
-            totalReturned += response.getPagination().getPageSize().intValue();
-        } while (totalReturned < totalAvailable);
+            totalAvailable = response.getPagination().getTotalAvailable();
+            totalReturned = totalReturned.add(response.getPagination().getPageSize());
+        } while (totalReturned.compareTo(totalAvailable) < 0);
         return false;
     }
 
